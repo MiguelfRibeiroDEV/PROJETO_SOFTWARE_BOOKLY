@@ -16,14 +16,13 @@
 ## Frontend
 
 * HTML5
-* CSS3
 * JavaScript
-* JavaScript
+* CSS
+* PHP
 
 ## Backend
 
-* Node.js
-* Express.js
+* Flask
 
 ## Banco de Dados
 
@@ -41,7 +40,6 @@ Com isso, espera-se aumentar a competitividade dos vendedores, reduzir erros de 
 
 ## Pré-requisitos
 
-* Node.js instalado
 * PostgreSQL instalado
 * Git instalado
 
