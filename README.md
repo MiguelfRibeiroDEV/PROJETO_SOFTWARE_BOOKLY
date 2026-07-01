@@ -1,6 +1,6 @@
 # Nome do Projeto
 
-**BookPrice AI – Sistema Inteligente de Precificação para Livros Usados**
+**BOOKLY**
 
 # Integrantes da Equipe
 
