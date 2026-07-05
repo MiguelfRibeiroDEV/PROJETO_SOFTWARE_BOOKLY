@@ -65,8 +65,8 @@ Com isso, espera-se aumentar a competitividade dos vendedores, reduzir erros de 
 * `livreiro_service.py`
 * `livro_service.py`
 
-#### ATUALIZAÇÃO NO DATABASE
-#### ATUALIZAÇÃO NO APP.PY
+#### - ATUALIZAÇÃO NO DATABASE
+#### - ATUALIZAÇÃO NO APP.PY
 
 ##  Como executar o backend
 
