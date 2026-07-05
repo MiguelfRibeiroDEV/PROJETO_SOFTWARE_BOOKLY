@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sebo de Livros</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="topo">
+    <a href="/telas/" class="marca">📚 Sebo de Livros</a>
+    <nav class="menu" id="menu"></nav>
+  </header>
+
+  <main class="conteudo">
+    <h1>Bem-vindo(a)</h1>
+    <p>Escolha uma entidade para cadastrar, listar, editar ou excluir registros:</p>
+    <div class="lista-cards" id="cards-home"></div>
+  </main>
+
+  <script src="/static/js/entities-config.js"></script>
+  <script src="/static/js/crud.js"></script>
+  <script>
+    montarMenu();
+    montarCardsHome();
+  </script>
+</body>
+</html>

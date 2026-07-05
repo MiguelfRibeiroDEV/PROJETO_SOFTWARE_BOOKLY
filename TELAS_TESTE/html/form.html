@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sebo de Livros</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="topo">
+    <a href="/telas/" class="marca">📚 Sebo de Livros</a>
+    <nav class="menu" id="menu"></nav>
+  </header>
+
+  <main class="conteudo">
+    <h1 id="titulo-pagina">Carregando...</h1>
+    <p id="mensagem-erro" class="mensagem-erro"></p>
+
+    <form id="formulario" onsubmit="salvarFormulario(event)">
+      <div id="form-campos"></div>
+      <div class="acoes-formulario">
+        <button type="submit" class="btn">Salvar</button>
+        <a id="link-cancelar" href="#" class="btn btn-cancelar">Cancelar</a>
+      </div>
+    </form>
+  </main>
+
+  <script src="/static/js/entities-config.js"></script>
+  <script src="/static/js/crud.js"></script>
+  <script>montarFormulario();</script>
+</body>
+</html>

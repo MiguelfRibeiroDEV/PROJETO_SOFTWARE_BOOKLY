@@ -1,0 +1,131 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, Arial, sans-serif;
+  background: #f6f5f2;
+  color: #2b2b2b;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: #2f4f4f;
+  color: #fff;
+  flex-wrap: wrap;
+}
+
+.marca {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.menu a {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 16px;
+  font-size: 0.95rem;
+}
+
+.menu a:hover { text-decoration: underline; }
+
+.conteudo {
+  max-width: 960px;
+  margin: 32px auto;
+  padding: 0 20px;
+}
+
+.cabecalho-pagina {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lista-cards {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  display: block;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  color: #2b2b2b;
+  font-weight: 600;
+}
+.card:hover { border-color: #2f4f4f; }
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  background: #fff;
+}
+
+.tabela th, .tabela td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.tabela th { background: #f0efe9; }
+
+.btn {
+  display: inline-block;
+  background: #2f4f4f;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.btn:hover { opacity: 0.9; }
+
+.btn-editar { background: #4a7a7a; }
+.btn-excluir { background: #b5453a; }
+.btn-cancelar { background: #888; margin-left: 8px; }
+
+.campo-formulario {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+}
+
+.campo-formulario label {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.campo-formulario input,
+.campo-formulario select,
+.campo-formulario textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.campo-formulario textarea { min-height: 80px; }
+
+.acoes-formulario { margin-top: 16px; }
+
+.mensagem-erro {
+  color: #b5453a;
+  font-weight: 600;
+}

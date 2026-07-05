@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sebo de Livros</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="topo">
+    <a href="/telas/" class="marca">📚 Sebo de Livros</a>
+    <nav class="menu" id="menu"></nav>
+  </header>
+
+  <main class="conteudo">
+    <div class="cabecalho-pagina">
+      <h1 id="titulo-pagina">Carregando...</h1>
+      <a class="btn btn-novo" id="link-novo" href="#">+ Novo</a>
+    </div>
+
+    <table class="tabela">
+      <thead>
+        <tr id="tabela-cabecalho"></tr>
+      </thead>
+      <tbody id="tabela-corpo"></tbody>
+    </table>
+  </main>
+
+  <script src="/static/js/entities-config.js"></script>
+  <script src="/static/js/crud.js"></script>
+  <script>carregarListagem();</script>
+</body>
+</html>
