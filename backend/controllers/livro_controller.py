@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import SQLAlchemyError
 from services.buscar_livros_filtro_service import BuscarLivrosFiltroService
 
+
 from services.livro_service import (
     CriarLivroService,
     ListarLivrosService,
@@ -37,6 +38,7 @@ def listar_livros():
     return jsonify(livros), 200
 
 
+
 @livro_controller.get("/livros/filtro")
 def buscar_livros_filtro():
     id_categoria = request.args.get("id_categoria", type=int)
@@ -55,6 +57,7 @@ def buscar_livros_filtro():
     except SQLAlchemyError:
         db.session.rollback()
         return jsonify({"erro": "Erro ao buscar livros no banco de dados."}), 500
+
 
 
 @livro_controller.get("/livros/<int:livro_id>")

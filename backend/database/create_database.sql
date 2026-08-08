@@ -129,5 +129,3 @@ INSERT INTO livreiro (login, senha, usuario, cpf, email, primeiro_nome, endereco
 VALUES ('vendedor_joao', 'senha_criptografada_123', 'joaobooks', '12345678901', 'joao@email.com', 'João', 'Belo Horizonte', 'MG');
 
 select * from livreiro;
-
-SHOW PROCEDURE STATUS WHERE Db = 'bookly_db';
