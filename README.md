@@ -65,9 +65,6 @@ Com isso, espera-se aumentar a competitividade dos vendedores, reduzir erros de 
 * `livreiro_service.py`
 * `livro_service.py`
 
-#### - ATUALIZAÇÃO NO DATABASE
-#### - ATUALIZAÇÃO NO APP.PY
-
 ##  Como executar o backend
 
 Siga os passos abaixo para configurar o ambiente e rodar a API localmente:
@@ -122,6 +119,23 @@ curl -X PUT http://localhost:5000/livros/1 -H "Content-Type: application/json" -
 # 6) Deletar
 curl -X DELETE http://localhost:5000/livros/1
 ```
+
+## Funcionalidades implementadas
+
+### 1. Busca de livros com filtros combinados
+
+- **Procedure:** `sp_buscar_livros_filtro`
+- **Rota:** `GET /livros/filtro?id_categoria=&id_livreiro=&preco_min=&preco_max=`
+- **Repository:** `LivroRepository.buscar_livros_filtro`
+- **Service:** `BuscarLivrosFiltroService`
+
+
+```bash
+curl "http://localhost:5000/livros/filtro?id_categoria=1&id_livreiro=1&preco_min=20&preco_max=100"
+```
+### 2. Telas FRONT-END
+
+
 
 
 
