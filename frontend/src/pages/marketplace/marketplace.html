@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookly - O seu sebo online</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/marketplace/marketplace.css">
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="top-header">
+    <a href="marketplace.html" class="bookly-logo">
+      <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+    </a>
+
+    <div class="search-container">
+      <div class="search-box">
+        <select class="search-select">
+          <option value="all">All</option>
+          <option value="titulo">Título</option>
+          <option value="autor">Autor</option>
+        </select>
+        <input type="text" id="search-input" placeholder="Search">
+        <button class="search-btn" id="search-btn" aria-label="Buscar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="white" stroke-width="2"/><path d="M21 21l-4-4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <nav class="nav-right" id="nav-right">
+      <a href="../cadastro-livro/cadastro.html" class="nav-link">Vender livro</a>
+      <a href="../planos/planos.html" class="nav-link">Planos</a>
+      <a href="../meus-pedidos/meus-pedidos.html" class="nav-link" id="nav-meus-pedidos" hidden>Meus pedidos</a>
+      <a href="../painel-vendedor/painel.html" class="nav-link" id="nav-painel" hidden>Painel de vendas</a>
+      <a href="../meu-catalogo/meu-catalogo.html" class="nav-link" id="nav-catalogo" hidden>Meu catálogo</a>
+      <a href="../login/login.html" class="nav-link" id="nav-login">Log in</a>
+      <a href="../register/register.html" class="btn btn-primary btn-sm" id="nav-signup">Sign up</a>
+    </nav>
+  </header>
+
+  <!-- LAYOUT PRINCIPAL: FILTROS + VITRINE -->
+  <div class="main-layout">
+
+    <aside class="sidebar">
+      <h3 class="filter-title">Filtro</h3>
+      <hr class="filter-divider">
+
+      <div class="filter-group">
+        <h4>Gênero / Categoria</h4>
+        <ul id="filtro-categoria" class="filter-list">
+          <li><a href="#" data-id-categoria="">Todos</a></li>
+        </ul>
+      </div>
+
+      <div class="filter-group">
+        <h4>Condição</h4>
+        <ul id="filtro-condicao" class="grid-list">
+          <li><a href="#" data-conservacao="">Todos</a></li>
+          <li><a href="#" data-conservacao="Perfeito">Perfeito</a></li>
+          <li><a href="#" data-conservacao="Bom">Bom</a></li>
+          <li><a href="#" data-conservacao="Médio">Médio</a></li>
+          <li><a href="#" data-conservacao="Ruim">Ruim</a></li>
+          <li><a href="#" data-conservacao="Péssimo">Péssimo</a></li>
+        </ul>
+      </div>
+
+      <div class="filter-group">
+        <h4>Idioma</h4>
+        <ul id="filtro-idioma">
+          <li><a href="#" data-idioma="">Todos</a></li>
+          <li><a href="#" data-idioma="Português (BR)">Português(br)</a></li>
+          <li><a href="#" data-idioma="Inglês">Inglês</a></li>
+          <li><a href="#" data-idioma="Espanhol">Espanhol</a></li>
+          <li><a href="#" data-idioma="Francês">Francês</a></li>
+          <li><a href="#" data-idioma="Japonês">Japonês</a></li>
+        </ul>
+      </div>
+
+      <div class="filter-group">
+        <h4>Preço (BRL)</h4>
+        <div class="price-range">
+          <div class="price-labels">
+            <span id="preco-min-label">R$10</span>
+            <span id="preco-max-label">R$789</span>
+          </div>
+          <input type="range" min="10" max="789" value="789" class="slider" id="preco-slider">
+        </div>
+      </div>
+    </aside>
+
+    <main class="storefront">
+      <p id="storefront-status" class="storefront-status">Carregando livros...</p>
+      <div class="book-grid" id="book-grid"></div>
+    </main>
+  </div>
+
+  <template id="book-card-template">
+    <div class="book-card">
+      <div class="book-cover">
+        <img alt="Capa do livro">
+      </div>
+      <div class="book-info">
+        <div class="book-header">
+          <h5 class="book-title"></h5>
+          <span class="book-price"></span>
+        </div>
+        <p class="book-author"></p>
+        <p class="book-meta"></p>
+        <div class="card-buttons">
+          <button class="btn-add-cart">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.4" fill="currentColor"/><circle cx="18" cy="20" r="1.4" fill="currentColor"/></svg>
+            Add cart
+          </button>
+          <button class="btn-buy-now">Buy now</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="marketplace.js"></script>
+</body>
+</html>

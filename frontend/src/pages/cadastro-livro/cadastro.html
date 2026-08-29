@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastrar Livro - Bookly</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/cadastro-livro/cadastro.css">
+</head>
+<body>
+
+  <a href="../marketplace/marketplace.html" class="bookly-logo page-logo">
+    <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+  </a>
+
+  <div class="wizard-card">
+
+    <h2 class="wizard-title" id="wizard-title">Cadastre seu livro</h2>
+
+    <!-- INDICADOR DE PASSOS -->
+    <div class="steps-indicator">
+      <div class="step" data-step="1">
+        <div class="step-circle">1</div>
+        <span class="step-label">Informações básicas</span>
+      </div>
+      <div class="step-line" data-line="1"></div>
+      <div class="step" data-step="2">
+        <div class="step-circle">2</div>
+        <span class="step-label">Características físicas</span>
+      </div>
+      <div class="step-line" data-line="2"></div>
+      <div class="step" data-step="3">
+        <div class="step-circle">3</div>
+        <span class="step-label">Precificação</span>
+      </div>
+    </div>
+
+    <!-- ================= PASSO 1 ================= -->
+    <section class="step-panel" id="panel-1">
+      <h3 class="panel-heading">Detalhes</h3>
+
+      <div class="panel-grid">
+        <div class="panel-col">
+          <div class="input-group">
+            <label for="titulo">Título do livro</label>
+            <input type="text" id="titulo" placeholder="escreva o nome do livro" required>
+          </div>
+
+          <div class="input-group">
+            <label for="autores">Autores</label>
+            <input type="text" id="autores" placeholder="escreva os autor(es)" required>
+          </div>
+
+          <div class="input-group">
+            <label for="ano-publicacao">Ano de publicação</label>
+            <input type="number" id="ano-publicacao" placeholder="ex: 1998" min="1400" max="2100">
+          </div>
+        </div>
+
+        <div class="panel-col panel-col-center">
+          <label class="photo-upload" for="foto-input">
+            <span class="photo-circle" id="photo-circle">
+              <svg id="photo-icon" width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z" stroke="white" stroke-width="1.6"/>
+                <circle cx="12" cy="13" r="3.2" stroke="white" stroke-width="1.6"/>
+              </svg>
+              <img id="photo-preview" alt="Prévia da foto do livro" hidden>
+            </span>
+            <span class="photo-text">Add foto</span>
+            <input type="file" id="foto-input" accept="image/*" hidden>
+          </label>
+
+          <div class="input-group full-width">
+            <label for="editora">Editora</label>
+            <input type="text" id="editora" placeholder="escreva a editora">
+          </div>
+
+          <div class="input-group full-width">
+            <label for="categoria">Categoria</label>
+            <select id="categoria" required>
+              <option value="">escolha a categoria</option>
+            </select>
+          </div>
+
+          <div class="input-group full-width">
+            <label for="idioma">Idioma</label>
+            <select id="idioma">
+              <option value="">escolha o idioma</option>
+              <option>Português (BR)</option>
+              <option>Inglês</option>
+              <option>Espanhol</option>
+              <option>Francês</option>
+              <option>Japonês</option>
+            </select>
+          </div>
+
+          <div class="input-group full-width">
+            <label>ISBN</label>
+            <div class="isbn-options">
+              <label class="checkbox-option">
+                <input type="checkbox" id="possui-isbn" checked>
+                possui
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" id="nao-possui-isbn">
+                não possui
+              </label>
+            </div>
+            <input type="text" id="isbn" placeholder="000-0000000000" class="isbn-input">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PASSO 2 ================= -->
+    <section class="step-panel" id="panel-2" hidden>
+      <h3 class="panel-heading">Estado do livro</h3>
+
+      <div class="chip-row" id="conservacao-group">
+        <button type="button" class="chip chip-lg" data-value="Perfeito">
+          <span class="chip-title">Perfeito</span>
+          <span class="chip-sub">Perfeitas condições</span>
+        </button>
+        <button type="button" class="chip chip-lg" data-value="Bom">
+          <span class="chip-title">Bom</span>
+          <span class="chip-sub">Condição muito boa</span>
+        </button>
+        <button type="button" class="chip chip-lg chip-selected" data-value="Médio">
+          <span class="chip-title">Médio</span>
+          <span class="chip-sub">Pequena avaria</span>
+        </button>
+        <button type="button" class="chip chip-lg" data-value="Ruim">
+          <span class="chip-title">Ruim</span>
+          <span class="chip-sub">Avaria notável</span>
+        </button>
+        <button type="button" class="chip chip-lg" data-value="Péssimo">
+          <span class="chip-title">Péssimo</span>
+          <span class="chip-sub">Danos significativos</span>
+        </button>
+      </div>
+
+      <div class="chip-row two-cols" id="capa-group">
+        <button type="button" class="chip chip-wide chip-selected" data-value="Capa dura">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="1.6"/><path d="M4 4l16 16M20 4L4 20" stroke="currentColor" stroke-width="0.8" opacity="0.4"/></svg>
+          Capa dura
+        </button>
+        <button type="button" class="chip chip-wide" data-value="Brochura">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="1.6"/></svg>
+          Brochura
+        </button>
+      </div>
+
+      <div class="chip-row wrap" id="raridade-group">
+        <button type="button" class="chip" data-value="Primeira edição">Primeira edição</button>
+        <button type="button" class="chip" data-value="Cópia assinada">Cópia Assinada</button>
+        <button type="button" class="chip chip-green" data-value="Impressão limitada">Impressão Limitada</button>
+        <button type="button" class="chip" data-value="Fora de catálogo">Fora de catálogo</button>
+        <button type="button" class="chip" data-value="Vintage">Vintage</button>
+        <button type="button" class="chip" data-value="Antiguidade">Anquidade</button>
+      </div>
+
+      <textarea id="observacoes" class="observacoes-area"
+        placeholder="Quaisquer anotações manuscritas, inscrições ou ex-líbris, Páginas rasgadas, manchas."></textarea>
+
+      <div class="input-group qty-group">
+        <label for="quantidade">Quantidade de exemplares iguais</label>
+        <input type="number" id="quantidade" value="1" min="1" max="99">
+      </div>
+    </section>
+
+    <!-- ================= PASSO 3 ================= -->
+    <section class="step-panel" id="panel-3" hidden>
+      <h3 class="panel-heading">Recomendação de preço</h3>
+
+      <div class="price-cards" id="price-cards">
+        <div class="price-card price-card-blue">
+          <span class="price-card-label">Preço médio da categoria</span>
+          <span class="price-card-value" id="card-medio">—</span>
+          <span class="price-card-sub">baseado nos itens cadastrados</span>
+        </div>
+        <div class="price-card price-card-green">
+          <span class="price-card-label">Preço mínimo</span>
+          <span class="price-card-value" id="card-minimo">—</span>
+          <span class="price-card-sub">menor preço da categoria</span>
+        </div>
+        <div class="price-card price-card-orange">
+          <span class="price-card-label">Preço máximo</span>
+          <span class="price-card-value" id="card-maximo">—</span>
+          <span class="price-card-sub">maior preço da categoria</span>
+        </div>
+        <div class="price-card price-card-purple">
+          <span class="price-card-label">Itens na categoria</span>
+          <span class="price-card-value" id="card-total">—</span>
+          <span class="price-card-sub">base de comparação</span>
+        </div>
+      </div>
+
+      <div class="chart-box">
+        <p class="chart-title">Comparação de preços na categoria</p>
+        <div class="bars" id="bars">
+          <div class="bar-col">
+            <div class="bar" id="bar-minimo" style="height:0%"></div>
+            <span>Mínimo</span>
+          </div>
+          <div class="bar-col">
+            <div class="bar bar-medio" id="bar-medio" style="height:0%"></div>
+            <span>Médio</span>
+          </div>
+          <div class="bar-col">
+            <div class="bar bar-maximo" id="bar-maximo" style="height:0%"></div>
+            <span>Máximo</span>
+          </div>
+        </div>
+        <p class="chart-empty" id="chart-empty" hidden>Ainda não há itens cadastrados nesta categoria para comparar.</p>
+      </div>
+
+      <div class="final-price-box">
+        <label for="preco-final">Escreva o preço final</label>
+        <div class="final-price-input">
+          <span>R$</span>
+          <input type="number" id="preco-final" step="0.01" min="0" placeholder="0,00" required>
+        </div>
+        <p class="price-diff" id="price-diff"></p>
+      </div>
+    </section>
+
+    <p id="wizard-error" class="form-error" hidden></p>
+
+    <!-- RODAPÉ -->
+    <div class="wizard-footer">
+      <button type="button" class="btn btn-outline" id="btn-voltar">Voltar</button>
+      <span class="step-counter" id="step-counter">Passo 1 de 3</span>
+      <button type="button" class="btn btn-primary" id="btn-continuar">Continuar</button>
+    </div>
+
+  </div>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="cadastro.js"></script>
+</body>
+</html>

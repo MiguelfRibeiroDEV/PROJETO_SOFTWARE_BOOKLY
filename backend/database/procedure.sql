@@ -1,5 +1,7 @@
 DELIMITER //
 
+DROP PROCEDURE IF EXISTS sp_buscar_livros_filtro //
+
 CREATE PROCEDURE sp_buscar_livros_filtro(
     IN p_id_categoria INT,
     IN p_id_livreiro INT,
@@ -12,11 +14,13 @@ BEGIN
         l.isbn,
         l.nome,
         l.autor,
+        l.idioma,
         c.nome AS categoria,
         lv.usuario AS livreiro,
         i.id_item,
         i.preco,
-        i.conservacao
+        i.conservacao,
+        i.fotos_item
     FROM livro l
     JOIN categoria c ON l.id_categoria = c.id_categoria
     JOIN livreiro lv ON l.id_livreiro = lv.id_livreiro

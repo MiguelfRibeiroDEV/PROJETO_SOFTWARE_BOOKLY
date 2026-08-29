@@ -24,7 +24,10 @@ def criar_comprador():
     except ValueError as erro:
         return jsonify({"erro": str(erro)}), 400
 
-    except SQLAlchemyError:
+    except SQLAlchemyError as erro:
+        print("\n" + "="*40)
+        print("ERRO REAL DO MYSQL:", erro)
+        print("="*40 + "\n")
         db.session.rollback()
         return jsonify({"erro": "Erro ao salvar comprador no banco de dados."}), 500
 

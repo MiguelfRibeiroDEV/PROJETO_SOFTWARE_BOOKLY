@@ -1,0 +1,86 @@
+.top-header {
+  background-color: #2c2c2c;
+  padding: 16px 40px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  border-bottom: 1px solid #1f1f1f;
+}
+
+.nav-right {
+  margin-left: auto;
+}
+
+.nav-link {
+  color: #e5e7eb;
+  font-size: 0.9rem;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+}
+
+.pedidos-container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  color: #f3f4f6;
+}
+
+.pedidos-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.pedidos-subtitle {
+  color: #b8bcc4;
+  margin-bottom: 28px;
+  font-size: 0.95rem;
+}
+
+.pedidos-status {
+  color: #b8bcc4;
+  font-size: 0.95rem;
+}
+
+.pedidos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pedido-card {
+  background: var(--bg-card, #f5f5f5);
+  border-radius: var(--radius-md, 14px);
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.pedido-livro {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.pedido-autor {
+  color: #6b6b6b;
+  font-size: 0.88rem;
+  margin-top: 2px;
+}
+
+.pedido-detalhes {
+  color: #6b6b6b;
+  font-size: 0.82rem;
+  margin-top: 6px;
+}
+
+.pedido-preco {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-primary, #2f80ed);
+  white-space: nowrap;
+}

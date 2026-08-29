@@ -1,5 +1,7 @@
 DELIMITER //
 
+DROP PROCEDURE IF EXISTS sp_relatorio_preco_medio_categoria //
+
 CREATE PROCEDURE sp_relatorio_preco_medio_categoria()
 BEGIN
     SELECT 

@@ -22,6 +22,10 @@ from controllers.comprador_controller import comprador_controller
 from controllers.item_controller import item_controller
 from controllers.estimativa_controller import estimativa_controller
 from controllers.relatorio_controller import relatorio_controller
+from controllers.auth_controller import auth_controller
+from controllers.pedido_controller import pedido_controller
+from controllers.dashboard_controller import dashboard_controller
+from controllers.catalogo_controller import catalogo_controller
 
 
 def create_app():
@@ -46,6 +50,10 @@ def create_app():
     app.register_blueprint(item_controller)
     app.register_blueprint(estimativa_controller)
     app.register_blueprint(relatorio_controller)
+    app.register_blueprint(auth_controller)
+    app.register_blueprint(pedido_controller)
+    app.register_blueprint(dashboard_controller)
+    app.register_blueprint(catalogo_controller)
 
     @app.get("/")
     def home():
@@ -53,6 +61,9 @@ def create_app():
             "mensagem": "API Bookly + Flask + MySQL rodando com sucesso!",
             "status": "Conectado",
             "rotas": {
+                "autenticacao": {
+                    "login": "POST /login",
+                },
                 "livreiros": {
                     "listar": "GET /livreiros",
                     "buscar": "GET /livreiros/<id>",
@@ -94,6 +105,18 @@ def create_app():
                     "criar": "POST /estimativas",
                     "atualizar": "PUT /estimativas/<id>",
                     "deletar": "DELETE /estimativas/<id>",
+                },
+                "pedidos": {
+                    "registrar_compra": "POST /pedidos",
+                    "historico_do_comprador": "GET /compradores/<id>/pedidos",
+                },
+                "dashboard": {
+                    "painel_do_livreiro": "GET /livreiros/<id>/dashboard",
+                },
+                "catalogo_do_livreiro": {
+                    "listar_meu_catalogo": "GET /livreiros/<id>/catalogo",
+                    "editar_anuncio": "PUT /livreiros/<id>/catalogo/<id_item>",
+                    "remover_anuncio": "DELETE /livreiros/<id>/catalogo/<id_item>",
                 },
             },
         })

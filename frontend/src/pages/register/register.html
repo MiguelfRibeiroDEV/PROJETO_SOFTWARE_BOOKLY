@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Conta - Bookly</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/register/register.css">
+</head>
+<body>
+
+  <div class="register-container">
+    <div class="register-header">
+      <h1 class="bookly-logo logo-big">
+        <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+      </h1>
+      <p class="welcome-text">Criar Conta</p>
+    </div>
+
+    <form id="register-form">
+      <!-- Abas Comprador / Vendedor -->
+      <div class="role-tabs">
+        <label class="tab-option">
+          <input type="radio" name="role" value="comprador" checked>
+          <span class="tab-button">Comprador</span>
+        </label>
+        <label class="tab-option">
+          <input type="radio" name="role" value="vendedor">
+          <span class="tab-button">Vendedor (Livreiro)</span>
+        </label>
+      </div>
+
+      <p class="section-title">Dados pessoais</p>
+      <div class="form-grid">
+        <div class="input-group">
+          <label for="primeiro-nome">Primeiro nome *</label>
+          <input type="text" id="primeiro-nome" placeholder="Seu nome" required>
+        </div>
+
+        <div class="input-group">
+          <label for="segundo-nome">Sobrenome</label>
+          <input type="text" id="segundo-nome" placeholder="Seu sobrenome">
+        </div>
+
+        <div class="input-group">
+          <label for="login">Login *</label>
+          <input type="text" id="login" placeholder="Escolha um login" required>
+        </div>
+
+        <div class="input-group">
+          <label for="usuario">Usuário *</label>
+          <input type="text" id="usuario" placeholder="Nome de usuário" required>
+        </div>
+
+        <div class="input-group">
+          <label for="senha">Senha *</label>
+          <input type="password" id="senha" placeholder="Mínimo 6 caracteres" required minlength="6">
+        </div>
+
+        <div class="input-group">
+          <label for="cpf">CPF *</label>
+          <input type="text" id="cpf" placeholder="somente números" required maxlength="11">
+        </div>
+
+        <div class="input-group">
+          <label for="email">E-mail *</label>
+          <input type="email" id="email" placeholder="seu@email.com" required>
+        </div>
+
+        <div class="input-group">
+          <label for="telefone">Telefone</label>
+          <input type="tel" id="telefone" placeholder="(00) 00000-0000">
+        </div>
+      </div>
+
+      <div class="input-group full-width">
+        <label for="data-nascimento">Data de nascimento</label>
+        <input type="date" id="data-nascimento">
+      </div>
+
+      <hr class="divider">
+
+      <p class="section-title">Endereço (opcional)</p>
+      <div class="form-grid">
+        <div class="input-group">
+          <label for="cep">CEP</label>
+          <input type="text" id="cep" placeholder="00000-000">
+        </div>
+
+        <div class="input-group">
+          <label for="estado">Estado</label>
+          <select id="estado">
+            <option value="">--</option>
+            <option value="AC">AC</option><option value="AL">AL</option>
+            <option value="AP">AP</option><option value="AM">AM</option>
+            <option value="BA">BA</option><option value="CE">CE</option>
+            <option value="DF">DF</option><option value="ES">ES</option>
+            <option value="GO">GO</option><option value="MA">MA</option>
+            <option value="MT">MT</option><option value="MS">MS</option>
+            <option value="MG">MG</option><option value="PA">PA</option>
+            <option value="PB">PB</option><option value="PR">PR</option>
+            <option value="PE">PE</option><option value="PI">PI</option>
+            <option value="RJ">RJ</option><option value="RN">RN</option>
+            <option value="RS">RS</option><option value="RO">RO</option>
+            <option value="RR">RR</option><option value="SC">SC</option>
+            <option value="SP">SP</option><option value="SE">SE</option>
+            <option value="TO">TO</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="cidade">Cidade</label>
+          <input type="text" id="cidade" placeholder="Sua cidade">
+        </div>
+
+        <div class="input-group">
+          <label for="bairro">Bairro</label>
+          <input type="text" id="bairro" placeholder="Seu bairro">
+        </div>
+
+        <div class="input-group">
+          <label for="rua">Rua</label>
+          <input type="text" id="rua" placeholder="Nome da rua">
+        </div>
+
+        <div class="input-group">
+          <label for="numero">Número</label>
+          <input type="text" id="numero" placeholder="Nº">
+        </div>
+      </div>
+
+      <p id="register-error" class="form-error" hidden></p>
+
+      <button type="submit" class="btn btn-primary btn-full">Criar conta</button>
+    </form>
+
+    <div class="register-footer">
+      <p>Já tem uma conta? <a href="../login/login.html">Entrar</a></p>
+    </div>
+  </div>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="register.js"></script>
+</body>
+</html>

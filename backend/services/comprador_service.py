@@ -1,108 +1,108 @@
+import re
+from sqlalchemy.exc import SQLAlchemyError
 from models.comprador_model import Comprador
+from models.database import db
 
 
 class CriarCompradorService:
     def executar(self, dados):
-        campos_obrigatorios = ["login", "senha", "usuario", "cpf", "email", "primeiro_nome"]
+        # --- TRATAMENTO E HIGIENIZAÇÃO DOS DADOS ---
 
-        for campo in campos_obrigatorios:
-            if not dados.get(campo):
-                raise ValueError(f"O campo '{campo}' é obrigatório.")
+        # 1. TRATAMENTO DO CEP: Remove ponto, hífen e espaços (ex: "30.850-470" -> "30850470")
+        cep_bruto = str(dados.get("endereco_cep") or dados.get("cep") or "")
+        cep_limpo = re.sub(r"\D", "", cep_bruto)
 
-        comprador_com_email = Comprador.buscar_por_email(dados["email"])
-        if comprador_com_email:
-            raise ValueError("Já existe um comprador cadastrado com este e-mail.")
+        # 2. TRATAMENTO DA CIDADE: Se vier "BELO HORIZONTE / MG", pega só "BELO HORIZONTE"
+        cidade_bruta = str(dados.get("endereco_cidade") or dados.get("cidade") or "")
+        cidade_limpa = cidade_bruta.split("/")[0].strip()
 
-        comprador_com_cpf = Comprador.buscar_por_cpf(dados["cpf"])
-        if comprador_com_cpf:
-            raise ValueError("Já existe um comprador cadastrado com este CPF.")
+        # 3. TRATAMENTO DO CPF E TELEFONE: Garante apenas números
+        cpf_bruto = str(dados.get("cpf") or "")
+        cpf_limpo = re.sub(r"\D", "", cpf_bruto)
 
+        telefone_bruto = str(dados.get("telefone") or "")
+        telefone_limpo = re.sub(r"\D", "", telefone_bruto)
+
+        # 4. TRATAMENTO DE TEXTOS (remove espaços desnecessários nas pontas)
+        primeiro_nome = str(dados.get("primeiro_nome") or "").strip()
+        segundo_nome = str(dados.get("segundo_nome") or "").strip()
+        email_limpo = str(dados.get("email") or "").strip().lower()
+
+        # --- CRIAÇÃO DO MODELO COMPRADOR ---
         comprador = Comprador(
-            login=dados["login"],
-            senha=dados["senha"],
-            usuario=dados["usuario"],
-            cpf=dados["cpf"],
-            email=dados["email"],
-            primeiro_nome=dados["primeiro_nome"],
-            segundo_nome=dados.get("segundo_nome"),
-            telefone=dados.get("telefone"),
-            data_nascimento=dados.get("data_nascimento"),
-            endereco_rua=dados.get("endereco_rua"),
-            endereco_numero=dados.get("endereco_numero"),
-            endereco_complemento=dados.get("endereco_complemento"),
-            endereco_bairro=dados.get("endereco_bairro"),
-            endereco_cidade=dados.get("endereco_cidade"),
-            endereco_estado=dados.get("endereco_estado"),
-            endereco_cep=dados.get("endereco_cep"),
+            login=dados.get("login") or email_limpo,
+            senha=dados.get("senha"),
+            usuario=dados.get("usuario"),
+            cpf=cpf_limpo,
+            telefone=telefone_limpo,
+            email=email_limpo,
+            primeiro_nome=primeiro_nome,
+            segundo_nome=segundo_nome,
+            data_nascimento=dados.get("data_nascimento") or None,
+            livros_comprados=dados.get("livros_comprados", 0),
+            endereco_rua=str(dados.get("endereco_rua") or dados.get("rua") or "").strip(),
+            endereco_numero=str(dados.get("endereco_numero") or dados.get("numero") or "").strip(),
+            endereco_complemento=str(dados.get("endereco_complemento") or dados.get("complemento") or "").strip(),
+            endereco_bairro=str(dados.get("endereco_bairro") or dados.get("bairro") or "").strip(),
+            endereco_cidade=cidade_limpa,
+            endereco_estado=str(dados.get("endereco_estado") or dados.get("estado") or "").strip().upper(),
+            endereco_cep=cep_limpo,  # CEP tratado com no máximo 8 dígitos
         )
 
-        comprador.salvar()
+        # Salva no banco de dados
+        db.session.add(comprador)
+        db.session.commit()
+
         return comprador.to_dict()
 
 
 class ListarCompradoresService:
     def executar(self):
-        compradores = Comprador.listar_todos()
-        return [comprador.to_dict() for comprador in compradores]
+        compradores = Comprador.query.all()
+        return [c.to_dict() for c in compradores]
 
 
 class BuscarCompradorPorIdService:
     def executar(self, comprador_id):
-        comprador = Comprador.buscar_por_id(comprador_id)
-
-        if comprador is None:
+        comprador = Comprador.query.get(comprador_id)
+        if not comprador:
             return None
-
         return comprador.to_dict()
 
 
 class AtualizarCompradorService:
     def executar(self, comprador_id, dados):
-        comprador = Comprador.buscar_por_id(comprador_id)
-
-        if comprador is None:
+        comprador = Comprador.query.get(comprador_id)
+        if not comprador:
             return None
 
-        novo_email = dados.get("email")
-        if novo_email:
-            comprador_com_email = Comprador.buscar_por_email(novo_email)
-            if comprador_com_email and comprador_com_email.id_comprador != comprador.id_comprador:
-                raise ValueError("Já existe outro comprador cadastrado com este e-mail.")
+        # Tratamento de CEP/CPF caso sejam atualizados
+        if "endereco_cep" in dados or "cep" in dados:
+            cep_bruto = str(dados.get("endereco_cep") or dados.get("cep") or "")
+            comprador.endereco_cep = re.sub(r"\D", "", cep_bruto)
 
-        novo_cpf = dados.get("cpf")
-        if novo_cpf:
-            comprador_com_cpf = Comprador.buscar_por_cpf(novo_cpf)
-            if comprador_com_cpf and comprador_com_cpf.id_comprador != comprador.id_comprador:
-                raise ValueError("Já existe outro comprador cadastrado com este CPF.")
+        if "cpf" in dados:
+            comprador.cpf = re.sub(r"\D", "", str(dados.get("cpf")))
 
-        comprador.atualizar(
-            login=dados.get("login"),
-            senha=dados.get("senha"),
-            usuario=dados.get("usuario"),
-            cpf=dados.get("cpf"),
-            email=dados.get("email"),
-            primeiro_nome=dados.get("primeiro_nome"),
-            segundo_nome=dados.get("segundo_nome"),
-            telefone=dados.get("telefone"),
-            data_nascimento=dados.get("data_nascimento"),
-            endereco_rua=dados.get("endereco_rua"),
-            endereco_numero=dados.get("endereco_numero"),
-            endereco_complemento=dados.get("endereco_complemento"),
-            endereco_bairro=dados.get("endereco_bairro"),
-            endereco_cidade=dados.get("endereco_cidade"),
-            endereco_estado=dados.get("endereco_estado"),
-            endereco_cep=dados.get("endereco_cep"),
-        )
+        if "telefone" in dados:
+            comprador.telefone = re.sub(r"\D", "", str(dados.get("telefone")))
 
+        if "primeiro_nome" in dados:
+            comprador.primeiro_nome = str(dados.get("primeiro_nome")).strip()
+
+        if "segundo_nome" in dados:
+            comprador.segundo_nome = str(dados.get("segundo_nome")).strip()
+
+        db.session.commit()
         return comprador.to_dict()
 
 
 class DeletarCompradorService:
     def executar(self, comprador_id):
-        comprador = Comprador.buscar_por_id(comprador_id)
-
-        if comprador is None:
+        comprador = Comprador.query.get(comprador_id)
+        if not comprador:
             return False
 
-        comprador.deletar()
+        db.session.delete(comprador)
+        db.session.commit()
         return True

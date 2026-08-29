@@ -6,7 +6,7 @@ class Livro(db.Model):
     __tablename__ = "livro"
 
     id_livro = db.Column(db.Integer, primary_key=True)
-    isbn = db.Column(db.String(20), nullable=False, unique=True)
+    isbn = db.Column(db.String(20), nullable=True, unique=True)
     nome = db.Column(db.String(200), nullable=False)
     autor = db.Column(db.String(150), nullable=False)
     editora = db.Column(db.String(150))
@@ -56,6 +56,12 @@ class Livro(db.Model):
     @staticmethod
     def buscar_por_isbn(isbn):
         return Livro.query.filter_by(isbn=isbn).first()
+
+    @staticmethod
+    def listar_por_livreiro(id_livreiro):
+        """READ: lista os livros cadastrados por um livreiro específico
+        (usado no painel 'Meu catálogo')."""
+        return Livro.query.filter_by(id_livreiro=id_livreiro).order_by(Livro.id_livro.asc()).all()
     
 
     @staticmethod

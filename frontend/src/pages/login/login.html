@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar - Bookly</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/login/login.css">
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-header">
+      <h1 class="bookly-logo logo-big">
+        <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+      </h1>
+      <p class="welcome-text">Bem-vindo de volta! Acesse sua conta.</p>
+    </div>
+
+    <form id="login-form">
+      <div class="input-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" placeholder="seuemail@exemplo.com" required>
+      </div>
+
+      <div class="input-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" placeholder="Digite sua senha" required>
+      </div>
+
+      <p id="login-error" class="form-error" hidden></p>
+
+      <button type="submit" class="btn btn-primary btn-full">Entrar</button>
+    </form>
+
+    <div class="login-footer">
+      <p>Não tem uma conta? <a href="../register/register.html">Crie uma agora</a></p>
+    </div>
+  </div>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="login.js"></script>
+</body>
+</html>

@@ -1,4 +1,6 @@
 from .database import db
+from sqlalchemy.dialects.mysql import LONGTEXT
+
 
 
 
@@ -15,7 +17,7 @@ class Item(db.Model):
     raridade = db.Column(db.String(50))
     tipo_capa = db.Column(db.String(50))
     presenca_de_grifos = db.Column(db.Boolean, default=False)
-    fotos_item = db.Column(db.Text)  # URLs separadas por vírgula
+    fotos_item = db.Column(LONGTEXT)  # foto em base64 (data URL) ou URLs separadas por vírgula
 
     # FKs: LIVRO (1) --- TEM --- (N) ITEM | COMPRADOR (1) --- COMPRA --- (N) ITEM
     id_livro = db.Column(db.Integer, db.ForeignKey("livro.id_livro"), nullable=False)

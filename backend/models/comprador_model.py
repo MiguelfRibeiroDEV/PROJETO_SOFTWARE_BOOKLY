@@ -52,6 +52,12 @@ class Comprador(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def registrar_compra(self):
+        """Atualiza as estatísticas do comprador após a compra de um item
+        (usado pelo caso de uso de registrar pedido)."""
+        self.livros_comprados = (self.livros_comprados or 0) + 1
+        db.session.commit()
+
 
     @staticmethod
     def listar_todos():

@@ -5,15 +5,21 @@ from models.categoria_model import Categoria
 
 class CriarLivroService:
     def executar(self, dados):
-        campos_obrigatorios = ["isbn", "nome", "autor", "id_livreiro", "id_categoria"]
+        campos_obrigatorios = ["nome", "autor", "id_livreiro", "id_categoria"]
 
         for campo in campos_obrigatorios:
             if not dados.get(campo):
                 raise ValueError(f"O campo '{campo}' é obrigatório.")
 
-        livro_existente = Livro.buscar_por_isbn(dados["isbn"])
-        if livro_existente:
-            raise ValueError("Já existe um livro cadastrado com este ISBN.")
+        # ISBN é opcional (o banco permite NULL). Normaliza string vazia
+        # para None, para não violar a constraint UNIQUE com vários
+        # livros "sem ISBN" cadastrados como "".
+        isbn_informado = (dados.get("isbn") or "").strip() or None
+
+        if isbn_informado:
+            livro_existente = Livro.buscar_por_isbn(isbn_informado)
+            if livro_existente:
+                raise ValueError("Já existe um livro cadastrado com este ISBN.")
 
         if not Livreiro.buscar_por_id(dados["id_livreiro"]):
             raise ValueError("Livreiro informado não existe.")
@@ -22,7 +28,7 @@ class CriarLivroService:
             raise ValueError("Categoria informada não existe.")
 
         livro = Livro(
-            isbn=dados["isbn"],
+            isbn=isbn_informado,
             nome=dados["nome"],
             autor=dados["autor"],
             id_livreiro=dados["id_livreiro"],

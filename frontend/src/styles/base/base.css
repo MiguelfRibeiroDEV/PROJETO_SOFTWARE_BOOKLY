@@ -1,0 +1,119 @@
+/* =========================================================
+   BASE.CSS
+   Reset global + variáveis de design + estilos reutilizados
+   por todas as páginas do Bookly (logo, botões, header, etc).
+   Este arquivo deve ser importado ANTES do CSS de cada página.
+========================================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+}
+
+:root {
+  /* Paleta geral */
+  --bg-app: #3b3b3b;
+  --bg-card: #f5f5f5;
+  --bg-input: #d9d9d9;
+  --bg-input-dark: #e4e4e4;
+  --text-main: #1a1a1a;
+  --text-muted: #6b6b6b;
+  --text-placeholder: #8a8a8a;
+
+  --color-primary: #2f80ed;
+  --color-primary-dark: #1c66c9;
+  --color-navy: #0c1230;
+  --color-green: #1fbf6b;
+  --color-red: #ff6b6b;
+
+  --border-light: #d0d0d0;
+  --radius-lg: 24px;
+  --radius-md: 14px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 20px 45px rgba(0, 0, 0, 0.35);
+}
+
+body {
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+input, select, textarea, button {
+  font-size: 0.95rem;
+}
+
+/* ================= LOGO BOOKLY (texto) =================
+   Reutilizada em todas as páginas: <span class="bookly-logo">
+   <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+   </span>
+*/
+.bookly-logo {
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  display: inline-block;
+}
+
+.bookly-logo .l-b { color: #fbe98a; }
+.bookly-logo .l-k { color: #ff6b6b; }
+.bookly-logo .l-l { color: #2f80ed; }
+
+/* ================= BOTÕES REUTILIZÁVEIS ================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  transition: filter 0.15s ease, transform 0.05s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1.5px solid #2a2a2a;
+  color: #1a1a1a;
+}
+
+.btn-outline:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* ================= SCROLLBAR (opcional, discreta) ================= */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #5a5a5a;
+  border-radius: 8px;
+}

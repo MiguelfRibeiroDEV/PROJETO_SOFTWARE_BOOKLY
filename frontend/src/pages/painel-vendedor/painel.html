@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookly - Painel do Vendedor</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/painel-vendedor/painel.css">
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="top-header">
+    <a href="../marketplace/marketplace.html" class="bookly-logo">
+      <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+    </a>
+    <nav class="nav-right">
+      <a href="../cadastro-livro/cadastro.html" class="nav-link">Vender livro</a>
+      <a href="../marketplace/marketplace.html" class="nav-link">Marketplace</a>
+      <a href="../meu-catalogo/meu-catalogo.html" class="nav-link">Meu catálogo</a>
+    </nav>
+  </header>
+
+  <main class="painel-container">
+    <h1 class="painel-title">Painel de Vendas</h1>
+    <p class="painel-subtitle">Acompanhe o desempenho da sua loja no Bookly.</p>
+
+    <p id="painel-status" class="painel-status">Carregando painel...</p>
+
+    <section class="painel-cards" id="painel-cards" hidden>
+      <div class="painel-card">
+        <span class="painel-card-label">Livros cadastrados</span>
+        <span class="painel-card-valor" id="card-registrados">0</span>
+      </div>
+      <div class="painel-card">
+        <span class="painel-card-label">Itens vendidos</span>
+        <span class="painel-card-valor" id="card-vendidos">0</span>
+      </div>
+      <div class="painel-card">
+        <span class="painel-card-label">Total faturado</span>
+        <span class="painel-card-valor" id="card-faturado">R$0,00</span>
+      </div>
+    </section>
+
+    <h2 class="ranking-title" id="ranking-title" hidden>Ranking de livros por receita</h2>
+    <div class="ranking-tabela" id="ranking-tabela"></div>
+  </main>
+
+  <template id="ranking-linha-template">
+    <div class="ranking-linha">
+      <div class="ranking-livro">
+        <span class="ranking-nome"></span>
+        <span class="ranking-autor"></span>
+      </div>
+      <span class="ranking-anunciados"></span>
+      <span class="ranking-vendidos"></span>
+      <span class="ranking-receita"></span>
+    </div>
+  </template>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="painel.js"></script>
+</body>
+</html>

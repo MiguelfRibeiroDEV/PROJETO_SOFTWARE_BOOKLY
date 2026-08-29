@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookly - Meus Pedidos</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/meus-pedidos/meus-pedidos.css">
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="top-header">
+    <a href="../marketplace/marketplace.html" class="bookly-logo">
+      <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+    </a>
+    <nav class="nav-right">
+      <a href="../marketplace/marketplace.html" class="nav-link">Marketplace</a>
+    </nav>
+  </header>
+
+  <main class="pedidos-container">
+    <h1 class="pedidos-title">Meus Pedidos</h1>
+    <p class="pedidos-subtitle">Histórico de livros que você já comprou no Bookly.</p>
+
+    <p id="pedidos-status" class="pedidos-status">Carregando pedidos...</p>
+
+    <div class="pedidos-lista" id="pedidos-lista"></div>
+  </main>
+
+  <template id="pedido-card-template">
+    <div class="pedido-card">
+      <div class="pedido-info">
+        <h3 class="pedido-livro"></h3>
+        <p class="pedido-autor"></p>
+        <p class="pedido-detalhes"></p>
+      </div>
+      <div class="pedido-preco"></div>
+    </div>
+  </template>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="meus-pedidos.js"></script>
+</body>
+</html>

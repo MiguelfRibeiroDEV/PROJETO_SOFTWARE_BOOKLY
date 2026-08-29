@@ -1,0 +1,145 @@
+body {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.register-container {
+  background-color: #202225;
+  padding: 2.5rem;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 640px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid #2a2e3d;
+  height: fit-content;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 1.8rem;
+}
+
+.logo-big {
+  font-size: 2.4rem;
+}
+
+.welcome-text {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin-top: 0.4rem;
+}
+
+/* Abas Comprador / Vendedor */
+.role-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+  background: #171922;
+  border-radius: var(--radius-pill);
+  padding: 5px;
+}
+
+.tab-option input {
+  display: none;
+}
+
+.tab-button {
+  display: block;
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  color: #9ca3af;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab-option input:checked + .tab-button {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #2e3243;
+  margin: 1.5rem 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.2rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.input-group label {
+  font-size: 0.82rem;
+  color: #cfd3dc;
+}
+
+.input-group input,
+.input-group select {
+  background-color: #2a2e3d;
+  border: 1px solid #3a3f52;
+  border-radius: var(--radius-md);
+  padding: 11px 14px;
+  color: #ffffff;
+}
+
+.input-group input::placeholder {
+  color: #6b7280;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.btn-full {
+  width: 100%;
+  margin-top: 0.6rem;
+}
+
+.form-error {
+  color: #ff6b6b;
+  font-size: 0.82rem;
+  margin: -0.4rem 0 0.8rem;
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: 1.4rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.register-footer a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 560px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

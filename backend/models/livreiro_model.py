@@ -59,6 +59,13 @@ class Livreiro(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def registrar_venda(self, valor_venda):
+        """Atualiza as estatísticas do livreiro após a venda de um item
+        (usado pelo caso de uso de registrar pedido)."""
+        self.livros_vendidos = (self.livros_vendidos or 0) + 1
+        self.total_faturado = (self.total_faturado or 0) + valor_venda
+        db.session.commit()
+
     @staticmethod
     def listar_todos():
         return Livreiro.query.order_by(Livreiro.id_livreiro.asc()).all()
