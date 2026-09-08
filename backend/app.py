@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify
 from flask_cors import CORS
-
 # Importa a instância do banco de dados
 from models.database import db
 
