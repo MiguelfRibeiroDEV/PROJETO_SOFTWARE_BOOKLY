@@ -30,7 +30,7 @@
 
 # Breve Descrição do Sistema
 
-O BookPrice AI é um sistema desenvolvido para auxiliar sebos e vendedores de livros usados na definição de preços mais adequados para seus produtos.
+O Bookly AI é um sistema desenvolvido para auxiliar sebos e vendedores de livros usados na definição de preços mais adequados para seus produtos.
 
 A plataforma busca reduzir a dificuldade de precificação enfrentada por esses vendedores, considerando fatores como estado de conservação do livro, raridade, demanda e preços praticados no mercado. O objetivo é apoiar a tomada de decisão, tornando o processo de precificação mais rápido, consistente e baseado em dados.
 
