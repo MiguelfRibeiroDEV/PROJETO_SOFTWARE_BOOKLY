@@ -675,3 +675,11 @@ WHERE c.id_comprador > 0;
 -- SELECT COUNT(*) FROM livro;     -- esperado: 100 (+ os que você já cadastrou)
 -- SELECT COUNT(*) FROM item;
 -- SELECT c.nome, COUNT(*) FROM livro l JOIN categoria c ON c.id_categoria = l.id_categoria GROUP BY c.nome;
+
+-- ---------------------------------------------------------
+-- DATAS DE VENDA (para o Relatório de vendas): espalha as vendas
+-- dos itens que já têm comprador pelos últimos ~60 dias.
+-- ---------------------------------------------------------
+UPDATE item
+   SET data_venda = DATE_SUB(NOW(), INTERVAL FLOOR(1 + RAND() * 60) DAY)
+ WHERE id_comprador IS NOT NULL AND data_venda IS NULL;

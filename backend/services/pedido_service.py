@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from models.item_model import Item
+from models.carrinho_model import Carrinho
 from models.livro_model import Livro
 from models.livreiro_model import Livreiro
 from models.comprador_model import Comprador
@@ -38,7 +41,8 @@ class RegistrarPedidoService:
         # --- EFETIVA A COMPRA (coordena as 3 entidades envolvidas) ---
         preco_pago = item.preco
 
-        item.atualizar(id_comprador=id_comprador)
+        item.atualizar(id_comprador=id_comprador, data_venda=datetime.now())
+        Carrinho.remover_por_item(item.id_item)  # vendido: sai do carrinho de todo mundo
         livreiro.registrar_venda(preco_pago)
         comprador.registrar_compra()
 

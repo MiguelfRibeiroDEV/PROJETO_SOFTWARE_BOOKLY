@@ -2,7 +2,7 @@
 
 Front-end reconstruído em **HTML + CSS + JavaScript puro** (sem frameworks),
 seguindo as 5 telas do protótipo: Login/Cadastro de usuário, Cadastro de
-livro (wizard de 3 passos), Marketplace (vitrine) e Planos.
+livro (wizard de 3 passos), Marketplace (vitrine) e demais telas do marketplace.
 
 ## Estrutura de pastas
 
@@ -18,14 +18,12 @@ frontend/
     │   ├── login/login.css
     │   ├── register/register.css
     │   ├── cadastro-livro/cadastro.css
-    │   ├── marketplace/marketplace.css
-    │   └── planos/planos.css
+    │   └── marketplace/marketplace.css
     └── pages/
         ├── login/           (login.html + login.js)
         ├── register/        (register.html + register.js)
         ├── cadastro-livro/  (cadastro.html + cadastro.js)   -> wizard 3 passos
-        ├── marketplace/     (marketplace.html + marketplace.js)
-        └── planos/          (planos.html)
+        └── marketplace/     (marketplace.html + marketplace.js)
 ```
 
 Cada página carrega primeiro `styles/base/base.css` (variáveis/reset/logo

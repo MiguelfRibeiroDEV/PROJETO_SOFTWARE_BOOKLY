@@ -1,3 +1,4 @@
+from sqlalchemy.dialects.mysql import LONGTEXT
 from .database import db
  
  
@@ -27,6 +28,9 @@ class Livreiro(db.Model):
     endereco_cidade = db.Column(db.String(100))
     endereco_estado = db.Column(db.String(2))
     endereco_cep = db.Column(db.String(9))
+
+    # foto de perfil em data-URL (base64), comprimida no front-end
+    foto_perfil = db.Column(db.Text().with_variant(LONGTEXT, "mysql"))
  
     # 1 LIVREIRO -> N LIVRO
     livros = db.relationship("Livro", backref="livreiro", lazy=True)
@@ -46,6 +50,7 @@ class Livreiro(db.Model):
             "livros_registrados", "livros_vendidos", "total_faturado",
             "endereco_rua", "endereco_numero", "endereco_complemento",
             "endereco_bairro", "endereco_cidade", "endereco_estado", "endereco_cep",
+            "foto_perfil",
         }   
         for campo, valor in dados.items():
             if campo in campos_permitidos and valor is not None:

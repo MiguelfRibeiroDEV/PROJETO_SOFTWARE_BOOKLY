@@ -1,0 +1,105 @@
+/* =========================================================
+   menu-usuario.css
+   Avatar + dropdown do usuário logado (carregado pelo menu-usuario.js).
+========================================================= */
+.user-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid #4a4a4a;
+  color: #2c2c2c;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0;
+  transition: border-color 0.15s ease;
+}
+
+.user-avatar:hover,
+.user-avatar[aria-expanded="true"] {
+  border-color: #ffffff;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 250px;
+  background: #2c2c2c;
+  border: 1px solid #444444;
+  border-radius: 10px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+  padding: 6px;
+  z-index: 50;
+}
+
+.user-dropdown[hidden] {
+  display: none;
+}
+
+.user-dropdown-head {
+  padding: 10px 12px 12px;
+  border-bottom: 1px solid #3d3d3d;
+  margin-bottom: 6px;
+}
+
+.user-dropdown-head strong {
+  display: block;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.user-dropdown-head small {
+  display: block;
+  color: #9ca3af;
+  font-size: 0.78rem;
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.user-dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.user-dropdown-item:hover {
+  background: #3a3a3a;
+  color: #ffffff;
+}
+
+.user-dropdown-sep {
+  height: 1px;
+  background: #3d3d3d;
+  margin: 6px 0;
+}
+
+.user-dropdown-sair {
+  color: #ff8b8b;
+}
+
+.user-dropdown-sair:hover {
+  color: #ff8b8b;
+}

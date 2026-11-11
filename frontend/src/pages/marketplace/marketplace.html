@@ -30,12 +30,6 @@
     </div>
 
     <nav class="nav-right" id="nav-right">
-      <a href="../cadastro-livro/cadastro.html" class="nav-link">Vender livro</a>
-      <a href="../planos/planos.html" class="nav-link">Planos</a>
-      <a href="../meus-pedidos/meus-pedidos.html" class="nav-link" id="nav-meus-pedidos" hidden>Meus pedidos</a>
-      <a href="../favoritos/favoritos.html" class="nav-link" id="nav-favoritos" hidden>Favoritos</a>
-      <a href="../painel-vendedor/painel.html" class="nav-link" id="nav-painel" hidden>Painel de vendas</a>
-      <a href="../meu-catalogo/meu-catalogo.html" class="nav-link" id="nav-catalogo" hidden>Meu catálogo</a>
       <a href="../login/login.html" class="nav-link" id="nav-login">Log in</a>
       <a href="../register/register.html" class="btn btn-primary btn-sm" id="nav-signup">Sign up</a>
     </nav>
@@ -113,15 +107,37 @@
         <div class="card-buttons">
           <button class="btn-add-cart">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.4" fill="currentColor"/><circle cx="18" cy="20" r="1.4" fill="currentColor"/></svg>
-            Add cart
+            <span class="add-cart-texto">Add cart</span>
           </button>
           <button class="btn-buy-now">Buy now</button>
         </div>
+        <button type="button" class="btn-perguntar">Perguntar ao vendedor</button>
       </div>
     </div>
   </template>
 
+  <!-- JANELA: perguntar ao vendedor -->
+  <div class="pergunta-overlay" id="pergunta-modal" hidden>
+    <div class="pergunta-modal" role="dialog" aria-modal="true" aria-labelledby="pergunta-modal-titulo">
+      <button type="button" class="pergunta-fechar" id="pergunta-fechar" aria-label="Fechar">&times;</button>
+      <h3 id="pergunta-modal-titulo">Perguntar ao vendedor</h3>
+      <p class="pergunta-modal-livro" id="pergunta-modal-livro"></p>
+
+      <div class="pergunta-historico" id="pergunta-historico"></div>
+
+      <form id="pergunta-form" novalidate>
+        <textarea id="pergunta-texto" rows="3" maxlength="500" placeholder="Escreva sua pergunta..." aria-label="Sua pergunta"></textarea>
+        <p class="pergunta-erro" id="pergunta-erro" hidden></p>
+        <div class="pergunta-acoes">
+          <button type="button" class="btn-pergunta-cancelar" id="pergunta-cancelar">Cancelar</button>
+          <button type="submit" class="btn-pergunta-enviar" id="pergunta-enviar">Enviar pergunta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="../../assets/js/api.js"></script>
+  <script src="../../assets/js/menu-usuario.js"></script>
   <script src="marketplace.js"></script>
 </body>
 </html>

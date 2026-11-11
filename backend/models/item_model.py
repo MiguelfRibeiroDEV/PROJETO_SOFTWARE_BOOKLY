@@ -17,6 +17,7 @@ class Item(db.Model):
     raridade = db.Column(db.String(50))
     tipo_capa = db.Column(db.String(50))
     presenca_de_grifos = db.Column(db.Boolean, default=False)
+    data_venda = db.Column(db.DateTime)  # quando o item foi comprado (relatório de vendas)
     fotos_item = db.Column(LONGTEXT)  # foto em base64 (data URL) ou URLs separadas por vírgula
 
     # FKs: LIVRO (1) --- TEM --- (N) ITEM | COMPRADOR (1) --- COMPRA --- (N) ITEM
@@ -39,7 +40,7 @@ class Item(db.Model):
         campos_permitidos = {
             "preco", "edicao", "descricao", "ano_aquisicao", "conservacao",
             "dedicatorio", "raridade", "tipo_capa", "presenca_de_grifos",
-            "fotos_item", "id_livro", "id_comprador",
+            "fotos_item", "id_livro", "id_comprador", "data_venda",
         }
         for campo, valor in dados.items():
             if campo in campos_permitidos and valor is not None:
@@ -83,4 +84,5 @@ class Item(db.Model):
             "fotos_item": self.fotos_item,
             "id_livro": self.id_livro,
             "id_comprador": self.id_comprador,
+            "data_venda": self.data_venda.isoformat() if self.data_venda else None,
         }

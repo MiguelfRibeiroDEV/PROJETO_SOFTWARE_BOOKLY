@@ -1,3 +1,4 @@
+from sqlalchemy.dialects.mysql import LONGTEXT
 from .database import db
 
 
@@ -27,6 +28,9 @@ class Comprador(db.Model):
     endereco_estado = db.Column(db.String(2))
     endereco_cep = db.Column(db.String(9))
 
+    # foto de perfil em data-URL (base64), comprimida no front-end
+    foto_perfil = db.Column(db.Text().with_variant(LONGTEXT, "mysql"))
+
 
     def salvar(self):
         """CREATE: salva um novo comprador no banco."""
@@ -40,6 +44,7 @@ class Comprador(db.Model):
             "primeiro_nome", "segundo_nome", "data_nascimento", "livros_comprados",
             "endereco_rua", "endereco_numero", "endereco_complemento",
             "endereco_bairro", "endereco_cidade", "endereco_estado", "endereco_cep",
+            "foto_perfil",
         }
         for campo, valor in dados.items():
             if campo in campos_permitidos and valor is not None:

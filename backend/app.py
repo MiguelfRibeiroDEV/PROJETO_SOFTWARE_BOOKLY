@@ -13,6 +13,8 @@ from models.comprador_model import Comprador
 from models.item_model import Item
 from models.estimativa_model import Estimativa
 from models.favorito_model import Favorito
+from models.carrinho_model import Carrinho
+from models.pergunta_model import Pergunta
 
 # Importa os controllers (Blueprints) com as rotas da API
 from controllers.livreiro_controller import livreiro_controller
@@ -27,6 +29,10 @@ from controllers.pedido_controller import pedido_controller
 from controllers.dashboard_controller import dashboard_controller
 from controllers.catalogo_controller import catalogo_controller
 from controllers.favorito_controller import favorito_controller
+from controllers.perfil_controller import perfil_controller
+from controllers.carrinho_controller import carrinho_controller
+from controllers.pergunta_controller import pergunta_controller
+from controllers.relatorio_vendas_controller import relatorio_vendas_controller
 
 
 def create_app():
@@ -56,6 +62,10 @@ def create_app():
     app.register_blueprint(dashboard_controller)
     app.register_blueprint(catalogo_controller)
     app.register_blueprint(favorito_controller)
+    app.register_blueprint(perfil_controller)
+    app.register_blueprint(carrinho_controller)
+    app.register_blueprint(pergunta_controller)
+    app.register_blueprint(relatorio_vendas_controller)
 
     @app.get("/")
     def home():
@@ -119,6 +129,31 @@ def create_app():
                     "listar_meu_catalogo": "GET /livreiros/<id>/catalogo",
                     "editar_anuncio": "PUT /livreiros/<id>/catalogo/<id_item>",
                     "remover_anuncio": "DELETE /livreiros/<id>/catalogo/<id_item>",
+                },
+                "favoritos": {
+                    "listar": "GET /compradores/<id>/favoritos",
+                    "adicionar": "POST /compradores/<id>/favoritos",
+                    "remover": "DELETE /compradores/<id>/favoritos/<id_item>",
+                },
+                "perfil": {
+                    "buscar": "GET /perfil/<comprador|livreiro>/<id>",
+                    "atualizar": "PUT /perfil/<comprador|livreiro>/<id>",
+                    "alterar_senha": "PUT /perfil/<comprador|livreiro>/<id>/senha",
+                },
+                "carrinho": {
+                    "listar": "GET /compradores/<id>/carrinho",
+                    "adicionar": "POST /compradores/<id>/carrinho",
+                    "remover": "DELETE /compradores/<id>/carrinho/<id_item>",
+                    "finalizar_compra": "POST /compradores/<id>/carrinho/finalizar",
+                },
+                "perguntas": {
+                    "perguntar": "POST /itens/<id_item>/perguntas",
+                    "perguntas_do_item": "GET /itens/<id_item>/perguntas",
+                    "recebidas_pelo_livreiro": "GET /livreiros/<id>/perguntas?status=pendentes|respondidas|todas",
+                    "responder": "PUT /perguntas/<id_pergunta>/resposta",
+                },
+                "relatorio_de_vendas": {
+                    "por_categoria_e_periodo": "GET /livreiros/<id>/relatorio-vendas?data_inicio=&data_fim=&id_categoria=",
                 },
             },
         })

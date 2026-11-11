@@ -29,7 +29,8 @@ CREATE TABLE livreiro (
     endereco_bairro      VARCHAR(100),
     endereco_cidade      VARCHAR(100),
     endereco_estado      CHAR(2),
-    endereco_cep         VARCHAR(9)
+    endereco_cep         VARCHAR(9),
+    foto_perfil          LONGTEXT
 ) ENGINE=InnoDB;
 
 -- =========================================================
@@ -54,7 +55,8 @@ CREATE TABLE comprador (
     endereco_bairro      VARCHAR(100),
     endereco_cidade      VARCHAR(100),
     endereco_estado      CHAR(2),
-    endereco_cep         VARCHAR(9)
+    endereco_cep         VARCHAR(9),
+    foto_perfil          LONGTEXT
 ) ENGINE=InnoDB;
 
 -- =========================================================
@@ -101,7 +103,8 @@ CREATE TABLE item (
     raridade            VARCHAR(50),
     tipo_capa           VARCHAR(50),
     presenca_de_grifos  BOOLEAN DEFAULT FALSE,
-    fotos_item          TEXT,
+    fotos_item          LONGTEXT,
+    data_venda          DATETIME NULL,
     id_livro            INT NOT NULL,
     id_comprador        INT,
     CONSTRAINT fk_item_livro     FOREIGN KEY (id_livro)     REFERENCES livro(id_livro),
@@ -121,6 +124,48 @@ CREATE TABLE estimativa (
 ) ENGINE=InnoDB;
 
 -- =========================================================
+-- 7. Entidade FAVORITO (comprador <-> item)
+-- =========================================================
+CREATE TABLE favorito (
+    id_favorito   INT AUTO_INCREMENT PRIMARY KEY,
+    id_comprador  INT NOT NULL,
+    id_item       INT NOT NULL,
+    data_criacao  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_favorito_comprador_item UNIQUE (id_comprador, id_item),
+    CONSTRAINT fk_favorito_comprador FOREIGN KEY (id_comprador) REFERENCES comprador(id_comprador),
+    CONSTRAINT fk_favorito_item      FOREIGN KEY (id_item)      REFERENCES item(id_item)
+) ENGINE=InnoDB;
+
+-- =========================================================
+-- 8. Entidade CARRINHO (comprador <-> item, antes da compra)
+-- =========================================================
+CREATE TABLE carrinho (
+    id_carrinho   INT AUTO_INCREMENT PRIMARY KEY,
+    id_comprador  INT NOT NULL,
+    id_item       INT NOT NULL,
+    data_adicao   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_carrinho_comprador_item UNIQUE (id_comprador, id_item),
+    CONSTRAINT fk_carrinho_comprador FOREIGN KEY (id_comprador) REFERENCES comprador(id_comprador),
+    CONSTRAINT fk_carrinho_item      FOREIGN KEY (id_item)      REFERENCES item(id_item)
+) ENGINE=InnoDB;
+
+-- =========================================================
+-- 9. Entidade PERGUNTA (comprador pergunta sobre um item; livreiro responde)
+-- =========================================================
+CREATE TABLE pergunta (
+    id_pergunta     INT AUTO_INCREMENT PRIMARY KEY,
+    id_item         INT NOT NULL,
+    id_comprador    INT NOT NULL,
+    texto_pergunta  VARCHAR(500) NOT NULL,
+    data_pergunta   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    texto_resposta  VARCHAR(500) NULL,
+    data_resposta   DATETIME NULL,
+    CONSTRAINT fk_pergunta_item      FOREIGN KEY (id_item)      REFERENCES item(id_item),
+    CONSTRAINT fk_pergunta_comprador FOREIGN KEY (id_comprador) REFERENCES comprador(id_comprador)
+) ENGINE=InnoDB;
+
+
+-- =========================================================
 -- ÍNDICES DE PERFORMANCE
 -- =========================================================
 CREATE INDEX idx_livro_livreiro   ON livro(id_livreiro);
@@ -128,6 +173,9 @@ CREATE INDEX idx_livro_categoria  ON livro(id_categoria);
 CREATE INDEX idx_item_livro       ON item(id_livro);
 CREATE INDEX idx_item_comprador   ON item(id_comprador);
 CREATE INDEX idx_estimativa_item  ON estimativa(id_item);
+CREATE INDEX idx_item_data_venda    ON item(data_venda);
+CREATE INDEX idx_pergunta_item      ON pergunta(id_item);
+CREATE INDEX idx_carrinho_comprador ON carrinho(id_comprador);
 
 -- =========================================================
 -- POPULANDO CATEGORIAS INICIAIS (Essencial para o Frontend)

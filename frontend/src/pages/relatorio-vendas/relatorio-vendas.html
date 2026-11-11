@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookly - Relatório de Vendas</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/relatorio-vendas/relatorio-vendas.css">
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="top-header">
+    <a href="../marketplace/marketplace.html" class="bookly-logo">
+      <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+    </a>
+    <nav class="nav-right">
+      <a href="../marketplace/marketplace.html" class="nav-link">Marketplace</a>
+    </nav>
+  </header>
+
+  <main class="rel-container">
+    <h1 class="rel-title">Relatório de Vendas</h1>
+    <p class="rel-subtitle">Veja quanto você vendeu por categoria em cada período.</p>
+
+    <form class="rel-filtros" id="form-filtros">
+      <div class="campo">
+        <label for="data_inicio">De</label>
+        <input type="date" id="data_inicio">
+      </div>
+      <div class="campo">
+        <label for="data_fim">Até</label>
+        <input type="date" id="data_fim">
+      </div>
+      <div class="campo">
+        <label for="id_categoria">Categoria</label>
+        <select id="id_categoria">
+          <option value="">Todas</option>
+        </select>
+      </div>
+      <div class="rel-filtros-acoes">
+        <button type="button" class="btn btn-outline btn-sm" id="btn-limpar">Limpar</button>
+        <button type="submit" class="btn btn-primary" id="btn-gerar">Gerar relatório</button>
+      </div>
+    </form>
+
+    <p id="rel-status" class="rel-status" role="status" hidden></p>
+
+    <div id="rel-conteudo" hidden>
+      <section class="rel-cards">
+        <div class="rel-card"><span class="rel-card-label">Receita no período</span><span class="rel-card-valor" id="card-receita">R$0,00</span></div>
+        <div class="rel-card"><span class="rel-card-label">Livros vendidos</span><span class="rel-card-valor" id="card-quantidade">0</span></div>
+        <div class="rel-card"><span class="rel-card-label">Ticket médio</span><span class="rel-card-valor" id="card-ticket">R$0,00</span></div>
+        <div class="rel-card"><span class="rel-card-label">Categoria líder</span><span class="rel-card-valor rel-card-texto" id="card-lider">-</span></div>
+      </section>
+
+      <section class="rel-box">
+        <h3>Receita por categoria</h3>
+        <div id="grafico-categorias"></div>
+      </section>
+
+      <section class="rel-box">
+        <h3>Vendas detalhadas</h3>
+        <div class="rel-tabela-wrap">
+          <table class="rel-tabela">
+            <thead>
+              <tr>
+                <th>Data</th><th>Livro</th><th>Categoria</th><th>Comprador</th><th class="r">Valor</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-vendas"></tbody>
+          </table>
+        </div>
+        <div class="rel-acoes">
+          <button type="button" class="btn btn-outline" id="btn-csv">Exportar CSV</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="../../assets/js/menu-usuario.js"></script>
+  <script src="relatorio-vendas.js"></script>
+</body>
+</html>

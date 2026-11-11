@@ -4,6 +4,7 @@ const template = document.getElementById("book-card-template");
 
 let todosOsLivros = [];
 let favoritosIds = new Set();
+let carrinhoIds = new Set();
 const filtros = { id_categoria: "", preco_max: 789, busca: "", conservacao: "", idioma: "" };
 
 const CORES_CAPA = ["#5b6ee1", "#e2637b", "#3fae7a", "#d1a13c", "#8158d6", "#3ea0c9"];
@@ -54,6 +55,12 @@ function renderizarLivros(lista) {
     const btnFavorito = card.querySelector(".btn-favorito");
     btnFavorito.dataset.idItem = livro.id_item;
     marcarCoracao(btnFavorito, favoritosIds.has(Number(livro.id_item)));
+    const btnCarrinho = card.querySelector(".btn-add-cart");
+    btnCarrinho.dataset.idItem = livro.id_item;
+    marcarCarrinho(btnCarrinho, carrinhoIds.has(Number(livro.id_item)));
+    const btnPerguntar = card.querySelector(".btn-perguntar");
+    btnPerguntar.dataset.idItem = livro.id_item;
+    btnPerguntar.dataset.nome = livro.nome;
 
     grid.appendChild(card);
   });
@@ -63,7 +70,7 @@ function aplicarFiltrosLocais() {
   const buscaLower = filtros.busca.trim().toLowerCase();
 
   const filtrados = todosOsLivros.filter((livro) => {
-    const passaCategoria = !filtros.id_categoria || livro.id_categoria === filtros.id_categoria;
+    const passaCategoria = !filtros.id_categoria || Number(livro.id_categoria) === Number(filtros.id_categoria);
     const passaPreco = Number(livro.preco) <= Number(filtros.preco_max);
     const passaConservacao = !filtros.conservacao || livro.conservacao === filtros.conservacao;
     const passaIdioma = !filtros.idioma || livro.idioma === filtros.idioma;
@@ -189,6 +196,7 @@ async function comprarItem(idItem, nomeLivro, botao) {
     });
 
     alert(`Compra de "${nomeLivro}" registrada com sucesso!`);
+    carrinhoIds.delete(Number(idItem));
     carregarLivros();
     carregarFavoritos();
   } catch (erro) {
@@ -263,23 +271,172 @@ grid.addEventListener("click", (event) => {
 });
 
 
-function atualizarNavPorLogin() {
-  const tipoUsuario = localStorage.getItem("bookly_usuario_tipo");
+// =========================================================
+// FUNCIONALIDADE: Carrinho de compras
+// POST /compradores/<id>/carrinho -> Controller -> Service -> Model
+// =========================================================
+function marcarCarrinho(botao, ativo) {
+  botao.classList.toggle("no-carrinho", ativo);
+  botao.querySelector(".add-cart-texto").textContent = ativo ? "No carrinho" : "Add cart";
+}
 
-  if (tipoUsuario === "comprador") {
-    document.getElementById("nav-meus-pedidos").hidden = false;
-    document.getElementById("nav-favoritos").hidden = false;
-  } else if (tipoUsuario === "livreiro") {
-    document.getElementById("nav-painel").hidden = false;
-    document.getElementById("nav-catalogo").hidden = false;
-  }
+async function carregarCarrinho() {
+  const idComprador = localStorage.getItem("bookly_usuario_id");
+  if (localStorage.getItem("bookly_usuario_tipo") !== "comprador" || !idComprador) return;
 
-  if (tipoUsuario) {
-    document.getElementById("nav-login").hidden = true;
-    document.getElementById("nav-signup").hidden = true;
+  try {
+    const carrinho = await apiRequest(`/compradores/${idComprador}/carrinho`);
+    carrinhoIds = new Set(carrinho.itens.filter((i) => i.disponivel).map((i) => Number(i.id_item)));
+    if (todosOsLivros.length > 0) aplicarFiltrosLocais();
+  } catch (erro) {
+    console.error("Não foi possível carregar o carrinho:", erro);
   }
 }
 
-atualizarNavPorLogin();
+async function adicionarAoCarrinho(botao) {
+  const idComprador = localStorage.getItem("bookly_usuario_id");
+  if (localStorage.getItem("bookly_usuario_tipo") !== "comprador" || !idComprador) {
+    alert("Faça login como comprador para usar o carrinho.");
+    window.location.href = "../login/login.html";
+    return;
+  }
+
+  const idItem = Number(botao.dataset.idItem);
+  if (carrinhoIds.has(idItem)) {
+    window.location.href = "../carrinho/carrinho.html";
+    return;
+  }
+
+  botao.disabled = true;
+  try {
+    await apiRequest(`/compradores/${idComprador}/carrinho`, { method: "POST", body: { id_item: idItem } });
+    carrinhoIds.add(idItem);
+    marcarCarrinho(botao, true);
+  } catch (erro) {
+    alert(erro.message);
+  } finally {
+    botao.disabled = false;
+  }
+}
+
+grid.addEventListener("click", (event) => {
+  const botao = event.target.closest(".btn-add-cart");
+  if (botao) adicionarAoCarrinho(botao);
+});
+
+
+// =========================================================
+// FUNCIONALIDADE: Perguntas ao vendedor
+// POST /itens/<id>/perguntas -> Controller -> Service -> Model
+// =========================================================
+const perguntaModal = document.getElementById("pergunta-modal");
+const perguntaForm = document.getElementById("pergunta-form");
+const perguntaTexto = document.getElementById("pergunta-texto");
+const perguntaErro = document.getElementById("pergunta-erro");
+const perguntaHistorico = document.getElementById("pergunta-historico");
+let itemDaPergunta = null;
+
+function mostrarErroPergunta(texto) {
+  perguntaErro.textContent = texto;
+  perguntaErro.hidden = !texto;
+}
+
+function desenharHistoricoPerguntas(perguntas) {
+  perguntaHistorico.textContent = "";
+  if (perguntas.length === 0) {
+    const vazio = document.createElement("p");
+    vazio.className = "pergunta-vazio";
+    vazio.textContent = "Ninguém perguntou nada sobre este livro ainda. Seja o primeiro!";
+    perguntaHistorico.appendChild(vazio);
+    return;
+  }
+
+  perguntas.forEach((p) => {
+    const bloco = document.createElement("div");
+    bloco.className = "pergunta-item";
+
+    const quem = document.createElement("p");
+    quem.className = "pergunta-pergunta";
+    const nome = document.createElement("b");
+    nome.textContent = p.comprador + ": ";
+    quem.append(nome, document.createTextNode(p.texto_pergunta));
+
+    const resposta = document.createElement("p");
+    resposta.className = p.texto_resposta ? "pergunta-resposta" : "pergunta-resposta pendente";
+    resposta.textContent = p.texto_resposta ? "Vendedor: " + p.texto_resposta : "Aguardando resposta do vendedor";
+
+    bloco.append(quem, resposta);
+    perguntaHistorico.appendChild(bloco);
+  });
+}
+
+async function abrirPergunta(botao) {
+  itemDaPergunta = Number(botao.dataset.idItem);
+  document.getElementById("pergunta-modal-livro").textContent = botao.dataset.nome;
+  perguntaTexto.value = "";
+  mostrarErroPergunta("");
+  perguntaHistorico.textContent = "Carregando...";
+  perguntaModal.hidden = false;
+  perguntaTexto.focus();
+
+  try {
+    desenharHistoricoPerguntas(await apiRequest(`/itens/${itemDaPergunta}/perguntas`));
+  } catch (erro) {
+    perguntaHistorico.textContent = "Não foi possível carregar as perguntas.";
+  }
+}
+
+function fecharPergunta() {
+  perguntaModal.hidden = true;
+  itemDaPergunta = null;
+}
+
+grid.addEventListener("click", (event) => {
+  const botao = event.target.closest(".btn-perguntar");
+  if (botao) abrirPergunta(botao);
+});
+
+document.getElementById("pergunta-fechar").addEventListener("click", fecharPergunta);
+document.getElementById("pergunta-cancelar").addEventListener("click", fecharPergunta);
+perguntaModal.addEventListener("click", (event) => {
+  if (event.target === perguntaModal) fecharPergunta();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !perguntaModal.hidden) fecharPergunta();
+});
+
+perguntaForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const idComprador = localStorage.getItem("bookly_usuario_id");
+  if (localStorage.getItem("bookly_usuario_tipo") !== "comprador" || !idComprador) {
+    mostrarErroPergunta("Faça login como comprador para perguntar ao vendedor.");
+    return;
+  }
+
+  const texto = perguntaTexto.value.trim();
+  if (texto.length < 3) {
+    mostrarErroPergunta("Escreva uma pergunta com pelo menos 3 caracteres.");
+    return;
+  }
+
+  const botao = document.getElementById("pergunta-enviar");
+  botao.disabled = true;
+  try {
+    await apiRequest(`/itens/${itemDaPergunta}/perguntas`, {
+      method: "POST",
+      body: { id_comprador: Number(idComprador), texto },
+    });
+    perguntaTexto.value = "";
+    mostrarErroPergunta("");
+    desenharHistoricoPerguntas(await apiRequest(`/itens/${itemDaPergunta}/perguntas`));
+  } catch (erro) {
+    mostrarErroPergunta(erro.message);
+  } finally {
+    botao.disabled = false;
+  }
+});
+
 carregarCategoriasNoFiltro();
 carregarLivros();
+carregarCarrinho();
+carregarFavoritos();

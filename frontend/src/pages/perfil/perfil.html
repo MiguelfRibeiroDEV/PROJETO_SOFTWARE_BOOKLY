@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookly - Meu perfil</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/perfil/perfil.css">
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="top-header">
+    <a href="../marketplace/marketplace.html" class="bookly-logo">
+      <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+    </a>
+    <nav class="nav-right">
+      <a href="../marketplace/marketplace.html" class="nav-link">Marketplace</a>
+    </nav>
+  </header>
+
+  <main class="perfil-container">
+    <p id="perfil-status" class="perfil-status">Carregando perfil...</p>
+
+    <div class="perfil-layout" id="perfil-layout" hidden>
+
+      <!-- COLUNA ESQUERDA: foto + resumo -->
+      <aside class="perfil-lateral">
+        <div class="perfil-foto" id="perfil-foto"></div>
+        <h2 id="perfil-nome-completo"></h2>
+        <p class="perfil-tipo" id="perfil-tipo"></p>
+
+        <input type="file" id="foto-input" accept="image/*" hidden>
+        <button type="button" class="btn btn-outline btn-block" id="btn-trocar-foto">Trocar foto</button>
+        <button type="button" class="btn btn-outline btn-danger btn-block" id="btn-remover-foto">Remover foto</button>
+
+        <div class="perfil-stats" id="perfil-stats"></div>
+      </aside>
+
+      <!-- COLUNA DIREITA: formulários -->
+      <div class="perfil-formularios">
+        <p id="perfil-msg" class="perfil-msg" role="status" hidden></p>
+
+        <form id="form-perfil" novalidate>
+          <section class="perfil-box">
+            <h3>Informações pessoais</h3>
+            <div class="perfil-grid">
+              <div class="campo">
+                <label for="primeiro_nome">Nome</label>
+                <input type="text" id="primeiro_nome" maxlength="100" required>
+              </div>
+              <div class="campo">
+                <label for="segundo_nome">Sobrenome</label>
+                <input type="text" id="segundo_nome" maxlength="100">
+              </div>
+              <div class="campo">
+                <label for="usuario">Nome de usuário</label>
+                <input type="text" id="usuario" maxlength="50" required>
+              </div>
+              <div class="campo">
+                <label for="telefone">Telefone</label>
+                <input type="tel" id="telefone" maxlength="20">
+              </div>
+              <div class="campo">
+                <label for="email">E-mail (não editável)</label>
+                <input type="text" id="email" disabled>
+              </div>
+              <div class="campo">
+                <label for="cpf">CPF (não editável)</label>
+                <input type="text" id="cpf" disabled>
+              </div>
+              <div class="campo">
+                <label for="data_nascimento">Data de nascimento</label>
+                <input type="date" id="data_nascimento">
+              </div>
+            </div>
+          </section>
+
+          <section class="perfil-box">
+            <h3>Endereço</h3>
+            <div class="perfil-grid">
+              <div class="campo">
+                <label for="endereco_cep">CEP</label>
+                <input type="text" id="endereco_cep" maxlength="9">
+              </div>
+              <div class="campo">
+                <label for="endereco_rua">Rua</label>
+                <input type="text" id="endereco_rua" maxlength="150">
+              </div>
+              <div class="campo">
+                <label for="endereco_numero">Número</label>
+                <input type="text" id="endereco_numero" maxlength="10">
+              </div>
+              <div class="campo">
+                <label for="endereco_complemento">Complemento</label>
+                <input type="text" id="endereco_complemento" maxlength="100">
+              </div>
+              <div class="campo">
+                <label for="endereco_bairro">Bairro</label>
+                <input type="text" id="endereco_bairro" maxlength="100">
+              </div>
+              <div class="campo">
+                <label for="endereco_cidade">Cidade</label>
+                <input type="text" id="endereco_cidade" maxlength="100">
+              </div>
+              <div class="campo">
+                <label for="endereco_estado">Estado (UF)</label>
+                <input type="text" id="endereco_estado" maxlength="2">
+              </div>
+            </div>
+            <div class="perfil-acoes">
+              <button type="submit" class="btn btn-primary" id="btn-salvar">Salvar alterações</button>
+            </div>
+          </section>
+        </form>
+
+        <form id="form-senha" novalidate>
+          <section class="perfil-box">
+            <h3>Alterar senha</h3>
+            <div class="perfil-grid">
+              <div class="campo campo-full">
+                <label for="senha_atual">Senha atual</label>
+                <input type="password" id="senha_atual" autocomplete="current-password">
+              </div>
+              <div class="campo">
+                <label for="senha_nova">Nova senha</label>
+                <input type="password" id="senha_nova" autocomplete="new-password">
+              </div>
+              <div class="campo">
+                <label for="senha_confirma">Confirmar nova senha</label>
+                <input type="password" id="senha_confirma" autocomplete="new-password">
+              </div>
+            </div>
+            <div class="perfil-acoes">
+              <button type="submit" class="btn btn-primary" id="btn-senha">Alterar senha</button>
+            </div>
+          </section>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="../../assets/js/menu-usuario.js"></script>
+  <script src="perfil.js"></script>
+</body>
+</html>

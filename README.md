@@ -86,9 +86,22 @@ mysql -u root -p bookly_db < backend/database/procedure.sql
 # 3) Cria a procedure de relatório de preço médio por categoria
 mysql -u root -p bookly_db < backend/database/procedure_relatorio.sql
 
-# 4) NOVA: cria a procedure do painel/dashboard do livreiro
+# 4) Cria a procedure do painel/dashboard do livreiro
 mysql -u root -p bookly_db < backend/database/procedure_dashboard_livreiro.sql
+
+# 5) NOVA: cria as procedures do relatório de vendas (por categoria e período)
+mysql -u root -p bookly_db < backend/database/procedure_relatorio_vendas.sql
+
+# 6) (Opcional) Popula o banco com 100 livros reais, livreiros e compradores de teste
+#    (senha de todos: teste123) — rode apenas UMA vez
+mysql -u root -p bookly_db < backend/database/seed_dados.sql
 ```
+
+> **Já tinha o banco criado antes das últimas funcionalidades?** Não precisa recriá-lo:
+> rode `backend/database/migracao_novas_funcionalidades.sql` (adiciona a foto de perfil,
+> a data da venda e as tabelas `favorito`, `carrinho` e `pergunta`) e depois rode de novo
+> o `procedure.sql` e o `procedure_relatorio_vendas.sql`. Se aparecer "Duplicate column name"
+> ou "already exists", é só porque aquilo já existia: pode ignorar.
 
 > Se você já tinha criado o banco antes desta atualização, basta rodar
 > o `procedure.sql` de novo — ele agora começa com `DROP PROCEDURE IF
@@ -169,6 +182,8 @@ E acesse `http://127.0.0.1:5500` no navegador.
 5. No **Marketplace**, clique em **"Buy now"** no livro cadastrado — isso registra o pedido.
 6. Acesse **"Meus pedidos"** (menu superior) e veja a compra no histórico.
 7. Faça login novamente como o **livreiro** e acesse **"Painel de vendas"** para ver o item vendido e o faturamento atualizados.
+8. Clique no **avatar** (canto superior direito): o menu dá acesso a **Meu perfil** (troque a foto e os dados), **Relatório de vendas**, **Perguntas recebidas** etc.
+9. Como comprador, use **"Add cart"** em alguns livros, abra o **Carrinho** pelo menu e **finalize a compra**; use **"Perguntar ao vendedor"** em um livro e responda como livreiro.
 ### BONUS. TESTES ATRAVÉS DO TERMINAL:
 ```bash
 # 1) Criar livreiro
@@ -210,7 +225,7 @@ Todas as funcionalidades abaixo estão implementadas de ponta a ponta:
 
 ### ✨ Novas funcionalidades adicionadas
 
-10. **Comprar item / Registrar Pedido** — Tela `marketplace.html` (botão "Buy now") → `POST /pedidos`
+11. **Comprar item / Registrar Pedido** — Tela `marketplace.html` (botão "Buy now") → `POST /pedidos`
     Coordena três entidades em um único caso de uso: marca o `Item` como vendido, atualiza as estatísticas do `Livreiro` (livros vendidos e faturamento) e do `Comprador` (livros comprados).
     - **Controller:** `PedidoController` (`controllers/pedido_controller.py`)
     - **Service:** `RegistrarPedidoService` (`services/pedido_service.py`)
@@ -220,26 +235,26 @@ Todas as funcionalidades abaixo estão implementadas de ponta a ponta:
     - **Rota:** `GET /compradores/<id>/pedidos`
     - **Service:** `ListarPedidosCompradorService`
 
-11. **Painel de Vendas do Livreiro (Dashboard)** — Nova tela `painel-vendedor/painel.html` → `GET /livreiros/<id>/dashboard`
+12. **Painel de Vendas do Livreiro (Dashboard)** — Nova tela `painel-vendedor/painel.html` → `GET /livreiros/<id>/dashboard`
     Mostra as estatísticas gerais do livreiro (livros cadastrados, itens vendidos, total faturado) e um **ranking de livros por receita**, via consulta especial encapsulada no Repository.
     - **Procedure:** `sp_dashboard_livreiro` (`backend/database/procedure_dashboard_livreiro.sql`)
     - **Repository:** `LivreiroRepository.dashboard_vendas` (`repositories/livreiro_repository.py`)
     - **Service:** `DashboardLivreiroService` (`services/dashboard_livreiro_service.py`)
     - **Controller:** `dashboard_controller` (`controllers/dashboard_controller.py`)
 
-12. **Listar meu catálogo (painel exclusivo do livreiro)** — Nova tela `meu-catalogo/meu-catalogo.html` → `GET /livreiros/<id>/catalogo`
+13. **Listar meu catálogo (painel exclusivo do livreiro)** — Nova tela `meu-catalogo/meu-catalogo.html` → `GET /livreiros/<id>/catalogo`
     Mostra, apenas para contas de livreiro, todos os livros/itens anunciados por ele no marketplace.
     - **Controller:** `catalogo_controller` (`controllers/catalogo_controller.py`)
     - **Service:** `ListarCatalogoLivreiroService` (`services/catalogo_service.py`)
     - **Models:** `Livro.listar_por_livreiro()`, `Item`
 
-13. **Editar anúncio (livro + item em uma única operação)** — Tela `meu-catalogo.html` (modal de edição) → `PUT /livreiros/<id>/catalogo/<id_item>`
+14. **Editar anúncio (livro + item em uma única operação)** — Tela `meu-catalogo.html` (modal de edição) → `PUT /livreiros/<id>/catalogo/<id_item>`
     Permite renomear o livro e alterar autor, editora, idioma, ano, categoria e preço/condição do exemplar, validando que o anúncio pertence ao livreiro logado. A alteração é refletida automaticamente no Marketplace na próxima consulta.
     - **Controller:** `catalogo_controller`
     - **Service:** `AtualizarAnuncioService` (`services/catalogo_service.py`)
     - **Models:** `Livro`, `Item`, `Categoria`
 
-14. **Remover anúncio do catálogo** — Tela `meu-catalogo.html` (botão "Remover") → `DELETE /livreiros/<id>/catalogo/<id_item>`
+15. **Remover anúncio do catálogo** — Tela `meu-catalogo.html` (botão "Remover") → `DELETE /livreiros/<id>/catalogo/<id_item>`
     Remove o item do marketplace, bloqueando a remoção de itens já vendidos.
     - **Controller:** `catalogo_controller`
     - **Service:** `RemoverAnuncioService` (`services/catalogo_service.py`)
@@ -263,6 +278,57 @@ curl -X PUT http://localhost:5000/livreiros/1/catalogo/1 -H "Content-Type: appli
 
 # Remover um anúncio (item 1) do catálogo do livreiro 1
 curl -X DELETE http://localhost:5000/livreiros/1/catalogo/1
+```
+
+### ✨ Funcionalidades da última etapa
+
+16. **Editar perfil (foto, nome e dados) + menu do usuário** — Nova tela `perfil/perfil.html`, aberta pelo avatar do cabeçalho (menu com as opções de cada tipo de conta) → `GET` e `PUT /perfil/<comprador|livreiro>/<id>`
+    O usuário troca a foto de perfil (comprimida no navegador e guardada em `foto_perfil`), o nome, o telefone, a data de nascimento e o endereço. Sem foto, o avatar mostra a inicial do nome. E-mail e CPF não são editáveis.
+    - **Controller:** `PerfilController` (`controllers/perfil_controller.py`)
+    - **Services:** `BuscarPerfilService` e `AtualizarPerfilService` (`services/perfil_service.py`)
+    - **Models:** `Comprador`, `Livreiro` (coluna `foto_perfil`)
+
+17. **Alterar senha** — Tela `perfil.html` (seção "Alterar senha") → `PUT /perfil/<tipo>/<id>/senha`
+    Exige a senha atual, a nova senha com 6+ caracteres e diferente da atual.
+    - **Controller:** `PerfilController`
+    - **Service:** `AlterarSenhaService` (`services/perfil_service.py`)
+
+18. **Carrinho de compras** — Botão "Add cart" do `marketplace.html` e nova tela `carrinho/carrinho.html` (com tela de carrinho vazio)
+    - `POST /compradores/<id>/carrinho` (adicionar) · `GET /compradores/<id>/carrinho` (listar, com subtotal por vendedor e total) · `DELETE /compradores/<id>/carrinho/<id_item>` (remover) · `POST /compradores/<id>/carrinho/finalizar` (comprar tudo)
+    - **Controller:** `CarrinhoController` (`controllers/carrinho_controller.py`)
+    - **Services:** `AdicionarAoCarrinhoService`, `ListarCarrinhoService`, `RemoverDoCarrinhoService`, `FinalizarCompraCarrinhoService` (`services/carrinho_service.py`; a finalização reaproveita `RegistrarPedidoService`)
+    - **Model:** `Carrinho` (tabela `carrinho`). Quando um item é vendido, ele sai do carrinho de todos os compradores.
+
+19. **Perguntas ao livreiro** — Comprador: botão "Perguntar ao vendedor" no `marketplace.html`. Livreiro: nova tela `perguntas/perguntas.html` (abas Pendentes / Respondidas / Todas)
+    - `POST /itens/<id_item>/perguntas` · `GET /itens/<id_item>/perguntas` · `GET /livreiros/<id>/perguntas?status=` · `PUT /perguntas/<id>/resposta`
+    - **Controller:** `PerguntaController` (`controllers/pergunta_controller.py`)
+    - **Services:** `CriarPerguntaService`, `ListarPerguntasItemService`, `ListarPerguntasLivreiroService`, `ResponderPerguntaService` (`services/pergunta_service.py`)
+    - **Model:** `Pergunta` (tabela `pergunta`). Só o livreiro dono do livro consegue responder.
+
+20. **Relatório de vendas por categoria e período** — Nova tela `relatorio-vendas/relatorio-vendas.html` → `GET /livreiros/<id>/relatorio-vendas?data_inicio=&data_fim=&id_categoria=`
+    Mostra receita, livros vendidos, ticket médio, categoria líder, gráfico de receita por categoria e a lista de vendas, com exportação em CSV. A data da venda (`item.data_venda`) passa a ser gravada na compra.
+    - **Procedures:** `sp_relatorio_vendas_detalhe` e `sp_relatorio_vendas_categoria` (`backend/database/procedure_relatorio_vendas.sql`)
+    - **Repository:** `RelatorioVendasRepository` (`repositories/relatorio_vendas_repository.py`, com `CALL` das procedures)
+    - **Service:** `BuscarRelatorioVendasService` (`services/relatorio_vendas_service.py`)
+    - **Controller:** `RelatorioVendasController` (`controllers/relatorio_vendas_controller.py`)
+
+Outros ajustes: a página de **Planos foi removida**; a procedure `sp_buscar_livros_filtro` agora devolve `id_categoria` e `id_livreiro` e **não lista mais itens já vendidos**.
+
+```bash
+# Perfil do comprador 1
+curl http://localhost:5000/perfil/comprador/1
+
+# Colocar o item 1 no carrinho do comprador 1 e finalizar a compra
+curl -X POST http://localhost:5000/compradores/1/carrinho -H "Content-Type: application/json" -d "{\"id_item\":1}"
+curl -X POST http://localhost:5000/compradores/1/carrinho/finalizar
+
+# Perguntar sobre o item 2 e responder (como livreiro dono do livro)
+curl -X POST http://localhost:5000/itens/2/perguntas -H "Content-Type: application/json" -d "{\"id_comprador\":1,\"texto\":\"A capa tem algum rasgo?\"}"
+curl "http://localhost:5000/livreiros/1/perguntas?status=pendentes"
+curl -X PUT http://localhost:5000/perguntas/1/resposta -H "Content-Type: application/json" -d "{\"id_livreiro\":1,\"texto_resposta\":\"Está em ótimo estado.\"}"
+
+# Relatório de vendas do livreiro 1 em outubro
+curl "http://localhost:5000/livreiros/1/relatorio-vendas?data_inicio=2026-10-01&data_fim=2026-10-31"
 ```
 
 ### Busca de livros com filtros combinados

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookly - Meu Carrinho</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/carrinho/carrinho.css">
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="top-header">
+    <a href="../marketplace/marketplace.html" class="bookly-logo">
+      <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+    </a>
+    <nav class="nav-right">
+      <a href="../marketplace/marketplace.html" class="nav-link">Marketplace</a>
+    </nav>
+  </header>
+
+  <main class="carrinho-container">
+    <h1 class="carrinho-title">Meu Carrinho</h1>
+    <p class="carrinho-subtitle" id="carrinho-subtitle">Carregando...</p>
+
+    <p id="carrinho-msg" class="carrinho-msg" role="status" hidden></p>
+
+    <!-- carrinho com livros -->
+    <div class="carrinho-layout" id="carrinho-layout" hidden>
+      <div class="carrinho-lista" id="carrinho-lista"></div>
+
+      <aside class="carrinho-resumo">
+        <h3>Resumo do pedido</h3>
+        <div id="resumo-vendedores"></div>
+        <div class="resumo-total"><span>Total</span><span id="resumo-total">R$0,00</span></div>
+        <button type="button" class="btn btn-primary btn-block" id="btn-finalizar">Finalizar compra</button>
+        <a href="../marketplace/marketplace.html" class="btn btn-outline btn-block">Continuar comprando</a>
+        <p class="resumo-nota">Ao finalizar, é criado um pedido para cada livro e os itens saem da vitrine.</p>
+      </aside>
+    </div>
+
+    <!-- carrinho vazio -->
+    <section class="carrinho-vazio" id="carrinho-vazio" hidden>
+      <div class="carrinho-vazio-icone">
+        <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.4 12.2a1.5 1.5 0 0 0 1.5 1.2h8.7a1.5 1.5 0 0 0 1.5-1.1L21 7H6"/></svg>
+      </div>
+      <h2>Seu carrinho está vazio</h2>
+      <p>Procurando o próximo livro? A gente te ajuda a encontrar.</p>
+      <a href="../marketplace/marketplace.html" class="btn btn-primary">Explorar livros</a>
+    </section>
+  </main>
+
+  <template id="carrinho-item-template">
+    <div class="carrinho-item">
+      <div class="carrinho-capa"><img alt="Capa do livro"></div>
+      <div class="carrinho-info">
+        <strong class="carrinho-livro"></strong>
+        <span class="carrinho-autor"></span>
+        <span class="carrinho-conservacao"></span>
+      </div>
+      <div class="carrinho-preco">
+        <b class="carrinho-valor"></b>
+        <button type="button" class="carrinho-remover">Remover</button>
+      </div>
+    </div>
+  </template>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="../../assets/js/menu-usuario.js"></script>
+  <script src="carrinho.js"></script>
+</body>
+</html>

@@ -42,6 +42,11 @@ body {
   min-height: 100vh;
 }
 
+/* o atributo hidden sempre esconde, mesmo que uma classe defina display */
+[hidden] {
+  display: none !important;
+}
+
 a {
   text-decoration: none;
   color: inherit;

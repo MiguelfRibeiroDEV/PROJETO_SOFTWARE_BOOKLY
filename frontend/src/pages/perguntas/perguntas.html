@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookly - Perguntas Recebidas</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/perguntas/perguntas.css">
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="top-header">
+    <a href="../marketplace/marketplace.html" class="bookly-logo">
+      <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+    </a>
+    <nav class="nav-right">
+      <a href="../marketplace/marketplace.html" class="nav-link">Marketplace</a>
+    </nav>
+  </header>
+
+  <main class="perg-container">
+    <h1 class="perg-title">Perguntas Recebidas</h1>
+    <p class="perg-subtitle">Compradores que querem saber mais sobre os seus livros.</p>
+
+    <div class="perg-abas" id="perg-abas" role="tablist">
+      <button type="button" class="perg-aba ativa" data-status="pendentes" role="tab">Pendentes <em id="contador-pendentes" hidden>0</em></button>
+      <button type="button" class="perg-aba" data-status="respondidas" role="tab">Respondidas</button>
+      <button type="button" class="perg-aba" data-status="todas" role="tab">Todas</button>
+    </div>
+
+    <p id="perg-msg" class="perg-msg" role="status" hidden></p>
+    <p id="perg-status" class="perg-status">Carregando perguntas...</p>
+
+    <div id="perg-lista"></div>
+  </main>
+
+  <template id="pergunta-template">
+    <article class="pergunta-card">
+      <div class="pergunta-topo">
+        <strong class="pergunta-livro"></strong>
+        <span class="pergunta-tag"></span>
+      </div>
+      <p class="pergunta-quem"></p>
+      <p class="pergunta-texto"></p>
+
+      <form class="pergunta-form" novalidate>
+        <textarea rows="3" maxlength="500" placeholder="Escreva sua resposta..." aria-label="Sua resposta"></textarea>
+        <div class="pergunta-form-acoes">
+          <span class="pergunta-contador">0/500</span>
+          <button type="submit" class="btn btn-primary">Responder</button>
+        </div>
+      </form>
+
+      <div class="pergunta-resposta" hidden>
+        <b>Sua resposta:</b> <span class="pergunta-resposta-texto"></span>
+      </div>
+    </article>
+  </template>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="../../assets/js/menu-usuario.js"></script>
+  <script src="perguntas.js"></script>
+</body>
+</html>
