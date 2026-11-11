@@ -3,16 +3,22 @@ from models.comprador_model import Comprador
 
 
 class AutenticarUsuarioService:
-    """Caso de uso: autenticar uma pessoa (livreiro ou comprador) por e-mail/senha."""
+    """Caso de uso: autenticar uma pessoa (livreiro ou comprador) por e-mail, usuário ou login."""
 
     def executar(self, dados):
-        email = str(dados.get("email") or "").strip().lower()
-        senha = dados.get("senha")
+        identificador = str(dados.get("email") or dados.get("usuario") or dados.get("login") or "").strip()
+        senha = str(dados.get("senha") or "")
 
-        if not email or not senha:
-            raise ValueError("Informe e-mail e senha.")
+        if not identificador or not senha:
+            raise ValueError("Informe e-mail (ou usuário) e senha.")
 
-        livreiro = Livreiro.buscar_por_email(email)
+        # 1. Tenta autenticar como Livreiro (por e-mail, nome de usuário ou login)
+        identificador_lower = identificador.lower()
+        livreiro = (
+            Livreiro.buscar_por_email(identificador_lower)
+            or Livreiro.buscar_por_usuario(identificador)
+            or Livreiro.buscar_por_login(identificador)
+        )
         if livreiro and livreiro.senha == senha:
             return {
                 "tipo": "livreiro",
@@ -22,7 +28,12 @@ class AutenticarUsuarioService:
                 "email": livreiro.email,
             }
 
-        comprador = Comprador.buscar_por_email(email)
+        # 2. Tenta autenticar como Comprador (por e-mail, nome de usuário ou login)
+        comprador = (
+            Comprador.buscar_por_email(identificador_lower)
+            or Comprador.buscar_por_usuario(identificador)
+            or Comprador.buscar_por_login(identificador)
+        )
         if comprador and comprador.senha == senha:
             return {
                 "tipo": "comprador",

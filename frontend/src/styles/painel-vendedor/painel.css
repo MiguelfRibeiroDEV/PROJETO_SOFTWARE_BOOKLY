@@ -1,48 +1,36 @@
 .top-header {
-  background-color: #2c2c2c;
+  background-color: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
   padding: 16px 40px;
   display: flex;
   align-items: center;
   gap: 24px;
-  border-bottom: 1px solid #1f1f1f;
-}
-
-.nav-right {
-  margin-left: auto;
-  display: flex;
-  gap: 20px;
-}
-
-.nav-link {
-  color: #e5e7eb;
-  font-size: 0.9rem;
-}
-
-.nav-link:hover {
-  color: #ffffff;
 }
 
 .painel-container {
-  max-width: 900px;
+  max-width: 1100px;
+  width: 100%;
   margin: 0 auto;
-  padding: 40px 24px 80px;
-  color: #f3f4f6;
+  padding: 36px 24px 80px;
+  color: var(--text-main);
+  box-sizing: border-box;
 }
 
 .painel-title {
-  font-size: 1.7rem;
+  font-size: 2rem;
   font-weight: 800;
   margin-bottom: 6px;
+  color: var(--text-main);
 }
 
 .painel-subtitle {
-  color: #b8bcc4;
+  color: var(--text-muted);
   margin-bottom: 28px;
   font-size: 0.95rem;
 }
 
 .painel-status {
-  color: #b8bcc4;
+  color: var(--text-muted);
   font-size: 0.95rem;
 }
 
@@ -54,32 +42,36 @@
 }
 
 .painel-card {
-  background: var(--bg-card, #f5f5f5);
-  border-radius: var(--radius-md, 14px);
-  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-theme);
 }
 
 .painel-card-label {
-  color: #6b6b6b;
-  font-size: 0.82rem;
-  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .painel-card-valor {
-  color: #1a1a1a;
-  font-size: 1.6rem;
+  color: var(--text-main);
+  font-size: 1.8rem;
   font-weight: 800;
 }
 
 .ranking-title {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+  color: var(--text-main);
 }
 
 .ranking-tabela {
@@ -89,39 +81,76 @@
 }
 
 .ranking-linha {
-  background: var(--bg-card, #f5f5f5);
-  border-radius: var(--radius-md, 14px);
-  padding: 14px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px 22px;
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   align-items: center;
-  gap: 10px;
-  color: #1a1a1a;
+  gap: 12px;
+  color: var(--text-main);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-theme);
 }
 
 .ranking-livro {
   display: flex;
   flex-direction: column;
+  gap: 3px;
 }
 
 .ranking-nome {
   font-weight: 700;
   font-size: 0.95rem;
+  color: var(--text-main);
 }
 
 .ranking-autor {
-  color: #6b6b6b;
-  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
 }
 
 .ranking-anunciados,
 .ranking-vendidos {
-  color: #6b6b6b;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
 }
 
 .ranking-receita {
   font-weight: 800;
-  color: var(--color-primary, #2f80ed);
+  color: var(--color-primary);
   text-align: right;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .painel-container {
+    padding: 24px 16px 60px;
+  }
+
+  .painel-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .ranking-linha {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+
+  .ranking-receita {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .painel-title {
+    font-size: 1.5rem;
+  }
+
+  .ranking-linha {
+    grid-template-columns: 1fr;
+  }
 }

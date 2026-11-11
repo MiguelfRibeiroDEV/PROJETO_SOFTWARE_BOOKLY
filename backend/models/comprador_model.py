@@ -68,9 +68,9 @@ class Comprador(db.Model):
     def listar_todos():
         return Comprador.query.order_by(Comprador.id_comprador.asc()).all()
 
-    @  staticmethod
+    @staticmethod
     def buscar_por_cpf(cpf):
-        """READ auxiliar: busca um livreiro pelo CPF."""
+        """READ auxiliar: busca um comprador pelo CPF."""
         return Comprador.query.filter_by(cpf=cpf).first()
 
     @staticmethod
@@ -78,17 +78,26 @@ class Comprador(db.Model):
         return Comprador.query.filter_by(email=email).first()
 
     @staticmethod
+    def buscar_por_usuario(usuario):
+        """READ auxiliar: busca um comprador pelo nome de usuário."""
+        return Comprador.query.filter_by(usuario=usuario).first()
+
+    @staticmethod
+    def buscar_por_login(login):
+        """READ auxiliar: busca um comprador pelo login."""
+        return Comprador.query.filter_by(login=login).first()
+
+    @staticmethod
     def buscar_por_id(id_comprador):
         """READ: busca um comprador pelo id."""
-        return Comprador.query.get(id_comprador)
+        return db.session.get(Comprador, id_comprador)
 
     def to_dict(self):
-        """Converte o objeto Comprador para dicionário/JSON"""
+        """Converte o objeto Comprador para dicionário/JSON (sem expor senha)."""
         return {
             "id_comprador": self.id_comprador,
             "login": self.login,
             "usuario": self.usuario,
-            "senha": self.senha,
             "cpf": self.cpf,
             "telefone": self.telefone,
             "email": self.email,
@@ -96,7 +105,7 @@ class Comprador(db.Model):
             "segundo_nome": self.segundo_nome,
             "data_nascimento": self.data_nascimento.isoformat() if self.data_nascimento else None,
             "data_cadastro": self.data_cadastro.isoformat() if self.data_cadastro else None,
-            "livros_comprados": self.livros_comprados,
+            "livros_comprados": self.livros_comprados or 0,
             "endereco_rua": self.endereco_rua,
             "endereco_numero": self.endereco_numero,
             "endereco_complemento": self.endereco_complemento,
@@ -104,4 +113,5 @@ class Comprador(db.Model):
             "endereco_cidade": self.endereco_cidade,
             "endereco_estado": self.endereco_estado,
             "endereco_cep": self.endereco_cep,
+            "foto_perfil": self.foto_perfil,
         }

@@ -7,10 +7,22 @@ from services.estimativa_service import (
     BuscarEstimativaPorIdService,
     AtualizarEstimativaService,
     DeletarEstimativaService,
+    PrecificarComIaService,
 )
 from models.database import db
 
 estimativa_controller = Blueprint("estimativa_controller", __name__)
+
+
+@estimativa_controller.post("/estimativas/ia-precificar")
+def ia_precificar():
+    try:
+        dados = request.get_json() or {}
+        service = PrecificarComIaService()
+        resultado = service.executar(dados)
+        return jsonify(resultado), 200
+    except Exception as erro:
+        return jsonify({"erro": str(erro)}), 500
 
 
 @estimativa_controller.post("/estimativas")

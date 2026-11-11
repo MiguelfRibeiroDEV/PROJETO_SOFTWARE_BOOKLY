@@ -3,6 +3,10 @@ import re
 from models.comprador_model import Comprador
 from models.livreiro_model import Livreiro
 from models.database import db
+from utils.validadores import (
+    tratar_telefone, tratar_cep, tratar_estado,
+    tratar_usuario, tratar_nome, tratar_texto_simples
+)
 
 TIPOS = {"comprador": Comprador, "livreiro": Livreiro}
 LIMITE_FOTO = 400_000  # caracteres do data-URL (a foto já chega comprimida)
@@ -13,7 +17,7 @@ def _buscar_usuario(tipo, usuario_id):
     modelo = TIPOS.get(tipo)
     if modelo is None:
         raise ValueError("Tipo de usuário inválido.")
-    return modelo.query.get(usuario_id)
+    return db.session.get(modelo, usuario_id)
 
 
 def _montar_perfil(tipo, usuario):
@@ -70,32 +74,42 @@ class AtualizarPerfilService:
             return None
 
         if "primeiro_nome" in dados:
-            nome = str(dados.get("primeiro_nome") or "").strip()
-            if not nome:
-                raise ValueError("O nome não pode ficar vazio.")
-            usuario.primeiro_nome = nome
+            usuario.primeiro_nome = tratar_nome(dados.get("primeiro_nome"), "Nome")
+
+        if "segundo_nome" in dados:
+            usuario.segundo_nome = tratar_nome(dados.get("segundo_nome"), "Sobrenome")
 
         if "usuario" in dados:
-            novo_usuario = str(dados.get("usuario") or "").strip()
-            if not novo_usuario:
-                raise ValueError("O nome de usuário não pode ficar vazio.")
+            novo_usuario = tratar_usuario(dados.get("usuario"))
             existente = type(usuario).query.filter_by(usuario=novo_usuario).first()
             if existente and existente is not usuario:
                 raise ValueError("Este nome de usuário já está em uso.")
             usuario.usuario = novo_usuario
 
-        for campo in self.CAMPOS_TEXTO:
-            if campo in dados:
-                setattr(usuario, campo, str(dados.get(campo) or "").strip() or None)
-
         if "telefone" in dados:
-            usuario.telefone = re.sub(r"\D", "", str(dados.get("telefone") or "")) or None
+            usuario.telefone = tratar_telefone(dados.get("telefone"))
 
         if "endereco_cep" in dados:
-            usuario.endereco_cep = re.sub(r"\D", "", str(dados.get("endereco_cep") or "")) or None
+            usuario.endereco_cep = tratar_cep(dados.get("endereco_cep"))
 
         if "endereco_estado" in dados:
-            usuario.endereco_estado = str(dados.get("endereco_estado") or "").strip().upper()[:2] or None
+            usuario.endereco_estado = tratar_estado(dados.get("endereco_estado"))
+
+        if "endereco_rua" in dados:
+            usuario.endereco_rua = tratar_texto_simples(dados.get("endereco_rua"), 150)
+
+        if "endereco_numero" in dados:
+            usuario.endereco_numero = tratar_texto_simples(dados.get("endereco_numero"), 10)
+
+        if "endereco_complemento" in dados:
+            usuario.endereco_complemento = tratar_texto_simples(dados.get("endereco_complemento"), 100)
+
+        if "endereco_bairro" in dados:
+            usuario.endereco_bairro = tratar_texto_simples(dados.get("endereco_bairro"), 100)
+
+        if "endereco_cidade" in dados:
+            cidade_raw = str(dados.get("endereco_cidade") or "").split("/")[0]
+            usuario.endereco_cidade = tratar_texto_simples(cidade_raw, 100)
 
         if "data_nascimento" in dados:
             usuario.data_nascimento = dados.get("data_nascimento") or None

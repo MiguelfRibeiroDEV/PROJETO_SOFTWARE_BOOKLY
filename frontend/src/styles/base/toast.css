@@ -1,0 +1,252 @@
+/* =========================================================
+   TOAST & MODAL DIALOG - BOOKLY
+   Substitutos modernos para alert() e confirm()
+========================================================= */
+
+/* Container de toasts fixo no canto superior direito */
+#bookly-toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+  width: calc(100vw - 48px);
+  pointer-events: none;
+}
+
+.bookly-toast {
+  pointer-events: auto;
+  background: #202228;
+  color: #f3f4f6;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  border: 1px solid #323644;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  transform: translateX(120%);
+  opacity: 0;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+.bookly-toast.is-visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.bookly-toast-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+}
+
+.bookly-toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.bookly-toast-title {
+  font-weight: 700;
+  font-size: 0.92rem;
+  margin-bottom: 2px;
+  color: #ffffff;
+}
+
+.bookly-toast-message {
+  color: #d1d5db;
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+
+.bookly-toast-action {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background-color: var(--color-primary, #2f80ed);
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.05s ease;
+}
+
+.bookly-toast-action:hover {
+  filter: brightness(1.15);
+}
+
+.bookly-toast-action:active {
+  transform: scale(0.97);
+}
+
+.bookly-toast-close {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+
+.bookly-toast-close:hover {
+  color: #ffffff;
+}
+
+/* Variações de cor do Toast */
+.bookly-toast.toast-success {
+  border-left: 4px solid #10b981;
+}
+.bookly-toast.toast-success .bookly-toast-icon {
+  color: #10b981;
+}
+
+.bookly-toast.toast-error {
+  border-left: 4px solid #ef4444;
+}
+.bookly-toast.toast-error .bookly-toast-icon {
+  color: #ef4444;
+}
+
+.bookly-toast.toast-warning {
+  border-left: 4px solid #f59e0b;
+}
+.bookly-toast.toast-warning .bookly-toast-icon {
+  color: #f59e0b;
+}
+
+.bookly-toast.toast-info {
+  border-left: 4px solid #3b82f6;
+}
+.bookly-toast.toast-info .bookly-toast-icon {
+  color: #3b82f6;
+}
+
+/* ================= MODAL DE CONFIRMAÇÃO ================= */
+.bookly-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.bookly-modal-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bookly-modal-card {
+  background: #202228;
+  border: 1px solid #323644;
+  border-radius: 16px;
+  max-width: 440px;
+  width: 100%;
+  padding: 28px 24px 22px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  transform: scale(0.92);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #f3f4f6;
+}
+
+.bookly-modal-overlay.is-active .bookly-modal-card {
+  transform: scale(1);
+}
+
+.bookly-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.bookly-modal-header h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.bookly-modal-body {
+  font-size: 0.92rem;
+  color: #9ca3af;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.bookly-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.bookly-modal-btn {
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: filter 0.15s ease, background-color 0.15s ease;
+}
+
+.bookly-modal-cancel {
+  background: #323644;
+  color: #e5e7eb;
+}
+
+.bookly-modal-cancel:hover {
+  background: #3f4455;
+}
+
+.bookly-modal-confirm {
+  background: var(--color-primary, #2f80ed);
+  color: #ffffff;
+}
+
+.bookly-modal-confirm:hover {
+  filter: brightness(1.12);
+}
+
+.bookly-modal-confirm.danger {
+  background: #ef4444;
+}
+
+@media (max-width: 500px) {
+  #bookly-toast-container {
+    top: 14px;
+    right: 14px;
+    width: calc(100vw - 28px);
+  }
+
+  .bookly-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .bookly-modal-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+

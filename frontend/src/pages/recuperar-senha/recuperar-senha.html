@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar Senha - Bookly</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/recuperar-senha/recuperar-senha.css">
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body>
+
+  <div class="recuperar-container">
+    <div class="recuperar-header">
+      <h1 class="bookly-logo logo-big">
+        <a href="../marketplace/marketplace.html">
+          <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+        </a>
+      </h1>
+      <p class="welcome-text">Recuperação de Senha</p>
+      <p class="welcome-subtext" id="passo-instrucao">
+        Informe seu e-mail e CPF cadastrados para confirmar sua identidade e redefinir sua senha.
+      </p>
+    </div>
+
+    <!-- ETAPA 1: Identificação (E-mail + CPF) -->
+    <form id="form-verificar">
+      <div class="input-group">
+        <label for="rec-email">E-mail cadastrado *</label>
+        <input type="email" id="rec-email" placeholder="seu@email.com" required autocomplete="email">
+      </div>
+
+      <div class="input-group">
+        <label for="rec-cpf">CPF do titular *</label>
+        <input type="text" id="rec-cpf" placeholder="000.000.000-00" required maxlength="14" autocomplete="off">
+      </div>
+
+      <p id="verificar-erro" class="form-error" hidden></p>
+
+      <button type="submit" class="btn btn-primary btn-full" id="btn-verificar">Verificar dados</button>
+    </form>
+
+    <!-- ETAPA 2: Redefinição (Nova Senha) - Revelada após confirmação no MySQL -->
+    <form id="form-redefinir" hidden>
+      <div class="card-sucesso" id="msg-identidade">
+        Identidade confirmada! Defina sua nova senha abaixo.
+      </div>
+
+      <div class="input-group">
+        <label for="nova-senha">Nova senha *</label>
+        <input type="password" id="nova-senha" placeholder="Mínimo de 6 caracteres" required minlength="6" autocomplete="new-password">
+      </div>
+
+      <div class="input-group">
+        <label for="confirma-senha">Confirmar nova senha *</label>
+        <input type="password" id="confirma-senha" placeholder="Digite a senha novamente" required minlength="6" autocomplete="new-password">
+      </div>
+
+      <p id="redefinir-erro" class="form-error" hidden></p>
+
+      <button type="submit" class="btn btn-primary btn-full" id="btn-redefinir">Salvar nova senha</button>
+    </form>
+
+    <div class="recuperar-footer">
+      <p>Lembrou sua senha? <a href="../login/login.html">Voltar para o login</a></p>
+    </div>
+  </div>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/masks.js"></script>
+  <script src="recuperar-senha.js"></script>
+</body>
+</html>
+

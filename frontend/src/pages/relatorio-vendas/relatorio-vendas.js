@@ -164,7 +164,7 @@ function exportarCsv() {
     ].map(aspas).join(";"));
   });
 
-  const blob = new Blob(["﻿" + linhas.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const blob = new Blob(["\uFEFF" + linhas.join("\r\n")], { type: "text/csv;charset=utf-8" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = "relatorio-de-vendas.csv";
@@ -172,6 +172,7 @@ function exportarCsv() {
   link.click();
   link.remove();
   URL.revokeObjectURL(link.href);
+  BooklyToast.success("Relatório CSV baixado com sucesso!");
 }
 
 document.getElementById("form-filtros").addEventListener("submit", (e) => {

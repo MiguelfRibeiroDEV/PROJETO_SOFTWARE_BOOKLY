@@ -6,12 +6,25 @@
   <title>Cadastrar Livro - Bookly</title>
   <link rel="stylesheet" href="../../styles/base/base.css">
   <link rel="stylesheet" href="../../styles/cadastro-livro/cadastro.css">
+  <script src="../../assets/js/theme.js"></script>
 </head>
 <body>
 
-  <a href="../marketplace/marketplace.html" class="bookly-logo page-logo">
-    <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
-  </a>
+  <!-- CABEÇALHO -->
+  <header class="top-header">
+    <a href="../marketplace/marketplace.html" class="bookly-logo">
+      <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+    </a>
+    <nav class="nav-right" id="nav-right">
+      <a href="../marketplace/marketplace.html" class="btn-voltar-marketplace">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Marketplace</span>
+      </a>
+    </nav>
+  </header>
 
   <div class="wizard-card">
 
@@ -41,9 +54,14 @@
 
       <div class="panel-grid">
         <div class="panel-col">
-          <div class="input-group">
+          <div class="input-group autocomplete-group">
             <label for="titulo">Título do livro</label>
-            <input type="text" id="titulo" placeholder="escreva o nome do livro" required>
+            <div class="autocomplete-wrap">
+              <input type="text" id="titulo" placeholder="Digite o nome do livro (ex: Dom Casmurro)" required autocomplete="off">
+              <span id="titulo-spinner" class="autocomplete-spinner" hidden></span>
+              <ul id="titulo-sugestoes" class="autocomplete-dropdown" hidden></ul>
+            </div>
+            <small class="campo-dica">Dica: digite para ver sugestões automáticas com autor, editora e capa.</small>
           </div>
 
           <div class="input-group">
@@ -95,7 +113,7 @@
           </div>
 
           <div class="input-group full-width">
-            <label>ISBN</label>
+            <label for="isbn">ISBN</label>
             <div class="isbn-options">
               <label class="checkbox-option">
                 <input type="checkbox" id="possui-isbn" checked>
@@ -106,7 +124,13 @@
                 não possui
               </label>
             </div>
-            <input type="text" id="isbn" placeholder="000-0000000000" class="isbn-input">
+            <div class="isbn-input-wrap" style="display:flex; gap:10px; align-items:center;">
+              <input type="text" id="isbn" placeholder="Digite o ISBN (ex: 9788532511010)" class="isbn-input" style="flex:1;">
+              <button type="button" id="btn-buscar-isbn" class="btn btn-outline btn-sm" style="white-space:nowrap; border-color:var(--border-color); color:var(--text-main); font-weight:600;">
+                Buscar dados
+              </button>
+            </div>
+            <small id="isbn-status" style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:5px; min-height:16px;"></small>
           </div>
         </div>
       </div>
@@ -199,19 +223,71 @@
         <p class="chart-title">Comparação de preços na categoria</p>
         <div class="bars" id="bars">
           <div class="bar-col">
+            <span class="bar-valor" id="val-bar-minimo">R$ 0,00</span>
             <div class="bar" id="bar-minimo" style="height:0%"></div>
-            <span>Mínimo</span>
+            <span class="bar-rotulo">Mínimo</span>
           </div>
           <div class="bar-col">
+            <span class="bar-valor" id="val-bar-medio">R$ 0,00</span>
             <div class="bar bar-medio" id="bar-medio" style="height:0%"></div>
-            <span>Médio</span>
+            <span class="bar-rotulo">Médio</span>
           </div>
           <div class="bar-col">
+            <span class="bar-valor" id="val-bar-maximo">R$ 0,00</span>
             <div class="bar bar-maximo" id="bar-maximo" style="height:0%"></div>
-            <span>Máximo</span>
+            <span class="bar-rotulo">Máximo</span>
           </div>
         </div>
         <p class="chart-empty" id="chart-empty" hidden>Ainda não há itens cadastrados nesta categoria para comparar.</p>
+      </div>
+
+      <!-- CARD BOOKLY AI (TOTALMENTE OPCIONAL - ESCOLHA DO USUÁRIO) -->
+      <div class="ai-pricing-card" id="ai-pricing-card">
+        <div class="ai-header">
+          <div class="ai-title-wrap">
+            <span class="ai-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            </span>
+            <div>
+              <h4 class="ai-title">Bookly AI · Sugestão Inteligente de Preço</h4>
+              <p class="ai-subtitle">Deseja a ajuda da nossa IA para sugerir o preço ideal avaliando conservação, encadernação e demanda?</p>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-pedir-ia">
+            <span>Precificar com IA</span>
+          </button>
+        </div>
+
+        <!-- Feedback de Carregamento -->
+        <div class="ai-loading" id="ai-loading" hidden>
+          <div class="ai-spinner"></div>
+          <span id="ai-loading-text">Analisando dados do livro e conservação com a Bookly AI...</span>
+        </div>
+
+        <!-- Resultado da IA -->
+        <div class="ai-result" id="ai-result" hidden>
+          <div class="ai-result-grid">
+            <div class="ai-price-box">
+              <span class="ai-price-label">Preço Sugerido</span>
+              <span class="ai-price-val" id="ai-preco-val">R$ 0,00</span>
+              <span class="ai-price-range" id="ai-faixa-val">Faixa recomendada: R$ 0,00 a R$ 0,00</span>
+              <button type="button" class="btn btn-primary btn-sm btn-adotar-preco" id="btn-adotar-preco-ia">
+                Adotar este preço
+              </button>
+            </div>
+            <div class="ai-insights-box">
+              <div class="ai-badge-row">
+                <span class="ai-badge" id="ai-badge-confianca">Confiança Alta</span>
+                <span class="ai-badge ai-badge-origem" id="ai-badge-origem">IA Gemini</span>
+              </div>
+              <p class="ai-justificativa" id="ai-justificativa-val"></p>
+              <div class="ai-fatores-tags" id="ai-fatores-tags"></div>
+              <button type="button" class="btn btn-outline btn-xs btn-adotar-desc" id="btn-adotar-desc-ia">
+                Aproveitar descrição comercial da IA
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="final-price-box">
@@ -236,6 +312,8 @@
   </div>
 
   <script src="../../assets/js/api.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/menu-usuario.js"></script>
   <script src="cadastro.js"></script>
 </body>
 </html>

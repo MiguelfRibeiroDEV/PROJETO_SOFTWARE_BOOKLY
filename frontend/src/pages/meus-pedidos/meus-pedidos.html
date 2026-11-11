@@ -6,6 +6,7 @@
   <title>Bookly - Meus Pedidos</title>
   <link rel="stylesheet" href="../../styles/base/base.css">
   <link rel="stylesheet" href="../../styles/meus-pedidos/meus-pedidos.css">
+  <script src="../../assets/js/theme.js"></script>
 </head>
 <body>
 
@@ -14,8 +15,14 @@
     <a href="../marketplace/marketplace.html" class="bookly-logo">
       <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
     </a>
-    <nav class="nav-right">
-      <a href="../marketplace/marketplace.html" class="nav-link">Marketplace</a>
+    <nav class="nav-right" id="nav-right">
+      <a href="../marketplace/marketplace.html" class="btn-voltar-marketplace">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Marketplace</span>
+      </a>
     </nav>
   </header>
 
@@ -40,6 +47,7 @@
   </template>
 
   <script src="../../assets/js/api.js"></script>
+  <script src="../../assets/js/toast.js"></script>
   <script src="../../assets/js/menu-usuario.js"></script>
   <script src="meus-pedidos.js"></script>
 </body>

@@ -1,46 +1,36 @@
 .top-header {
-  background-color: #2c2c2c;
+  background-color: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
   padding: 16px 40px;
   display: flex;
   align-items: center;
   gap: 24px;
-  border-bottom: 1px solid #1f1f1f;
-}
-
-.nav-right {
-  margin-left: auto;
-}
-
-.nav-link {
-  color: #e5e7eb;
-  font-size: 0.9rem;
-}
-
-.nav-link:hover {
-  color: #ffffff;
 }
 
 .pedidos-container {
-  max-width: 760px;
+  max-width: 860px;
+  width: 100%;
   margin: 0 auto;
-  padding: 40px 24px 80px;
-  color: #f3f4f6;
+  padding: 36px 24px 80px;
+  color: var(--text-main);
+  box-sizing: border-box;
 }
 
 .pedidos-title {
-  font-size: 1.7rem;
+  font-size: 2rem;
   font-weight: 800;
   margin-bottom: 6px;
+  color: var(--text-main);
 }
 
 .pedidos-subtitle {
-  color: #b8bcc4;
+  color: var(--text-muted);
   margin-bottom: 28px;
   font-size: 0.95rem;
 }
 
 .pedidos-status {
-  color: #b8bcc4;
+  color: var(--text-muted);
   font-size: 0.95rem;
 }
 
@@ -51,36 +41,72 @@
 }
 
 .pedido-card {
-  background: var(--bg-card, #f5f5f5);
-  border-radius: var(--radius-md, 14px);
-  padding: 18px 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 18px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
+  color: var(--text-main);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-theme);
 }
 
-.pedido-livro {
-  font-size: 1.05rem;
+.pedido-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pedido-titulo {
   font-weight: 700;
-  color: #1a1a1a;
+  font-size: 1.05rem;
+  color: var(--text-main);
 }
 
 .pedido-autor {
-  color: #6b6b6b;
-  font-size: 0.88rem;
-  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
-.pedido-detalhes {
-  color: #6b6b6b;
-  font-size: 0.82rem;
-  margin-top: 6px;
+.pedido-vendedor {
+  color: var(--text-muted);
+  font-size: 0.8rem;
 }
 
-.pedido-preco {
-  font-size: 1.1rem;
+.pedido-meta {
+  text-align: right;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pedido-valor {
   font-weight: 800;
-  color: var(--color-primary, #2f80ed);
-  white-space: nowrap;
+  font-size: 1.2rem;
+  color: var(--color-primary);
+}
+
+.pedido-data {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .pedidos-container {
+    padding: 24px 16px 60px;
+  }
+
+  .pedido-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pedido-meta {
+    text-align: left;
+    margin-top: 8px;
+  }
 }

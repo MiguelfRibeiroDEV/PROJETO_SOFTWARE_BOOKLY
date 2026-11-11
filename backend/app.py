@@ -33,6 +33,7 @@ from controllers.perfil_controller import perfil_controller
 from controllers.carrinho_controller import carrinho_controller
 from controllers.pergunta_controller import pergunta_controller
 from controllers.relatorio_vendas_controller import relatorio_vendas_controller
+from controllers.recuperar_senha_controller import recuperar_senha_controller
 
 
 def create_app():
@@ -41,8 +42,8 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
 
-    # Configuração de conexão com o MySQL do WampServer
-    mysql_padrao = "mysql+pymysql://root:@localhost/bookly_db"
+    # Configuração de conexão com o MySQL do WampServer com suporte completo a UTF-8 (utf8mb4)
+    mysql_padrao = "mysql+pymysql://root:@localhost/bookly_db?charset=utf8mb4"
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", mysql_padrao)
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -66,6 +67,7 @@ def create_app():
     app.register_blueprint(carrinho_controller)
     app.register_blueprint(pergunta_controller)
     app.register_blueprint(relatorio_vendas_controller)
+    app.register_blueprint(recuperar_senha_controller)
 
     @app.get("/")
     def home():

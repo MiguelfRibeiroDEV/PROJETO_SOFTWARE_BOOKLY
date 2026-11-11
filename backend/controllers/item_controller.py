@@ -7,10 +7,21 @@ from services.item_service import (
     BuscarItemPorIdService,
     AtualizarItemService,
     DeletarItemService,
+    ObterFaixaPrecoService,
 )
 from models.database import db
 
 item_controller = Blueprint("item_controller", __name__)
+
+
+@item_controller.get("/itens/faixa-preco")
+def obter_faixa_preco():
+    try:
+        service = ObterFaixaPrecoService()
+        faixa = service.executar()
+        return jsonify(faixa), 200
+    except Exception as erro:
+        return jsonify({"erro": str(erro)}), 500
 
 
 @item_controller.post("/itens")

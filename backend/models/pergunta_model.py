@@ -27,7 +27,7 @@ class Pergunta(db.Model):
 
     @staticmethod
     def buscar_por_id(id_pergunta):
-        return Pergunta.query.get(id_pergunta)
+        return db.session.get(Pergunta, id_pergunta)
 
     @staticmethod
     def listar_por_item(id_item):

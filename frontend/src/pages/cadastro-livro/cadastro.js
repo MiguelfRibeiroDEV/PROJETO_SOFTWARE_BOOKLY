@@ -25,7 +25,7 @@ const ID_LIVREIRO_ATUAL = Number(localStorage.getItem("bookly_livreiro_id")) || 
   const tipoUsuario = localStorage.getItem("bookly_usuario_tipo");
 
   if (!idLivreiro || tipoUsuario !== "livreiro") {
-    alert("Faça login como vendedor (livreiro) para cadastrar um livro.");
+    sessionStorage.setItem("bookly_flash_aviso", "Faça login como vendedor (livreiro) para cadastrar um livro.");
     window.location.href = "../login/login.html";
   }
 })();
@@ -113,20 +113,349 @@ document.getElementById("btn-continuar").addEventListener("click", async () => {
 });
 
 // =========================================================
-// ISBN: alterna entre "possui" / "não possui"
+// ISBN: alterna entre "possui" / "não possui" e busca automática
 // =========================================================
 const possuiIsbnEl = document.getElementById("possui-isbn");
 const naoPossuiIsbnEl = document.getElementById("nao-possui-isbn");
 const isbnInput = document.getElementById("isbn");
+const btnBuscarIsbn = document.getElementById("btn-buscar-isbn");
+const isbnStatus = document.getElementById("isbn-status");
 
 function sincronizarIsbn(origem) {
   if (origem === "possui" && possuiIsbnEl.checked) naoPossuiIsbnEl.checked = false;
   if (origem === "nao-possui" && naoPossuiIsbnEl.checked) possuiIsbnEl.checked = false;
   isbnInput.disabled = naoPossuiIsbnEl.checked;
-  if (isbnInput.disabled) isbnInput.value = "";
+  if (btnBuscarIsbn) btnBuscarIsbn.disabled = naoPossuiIsbnEl.checked;
+  if (isbnInput.disabled) {
+    isbnInput.value = "";
+    if (isbnStatus) isbnStatus.textContent = "";
+  }
 }
 possuiIsbnEl.addEventListener("change", () => sincronizarIsbn("possui"));
 naoPossuiIsbnEl.addEventListener("change", () => sincronizarIsbn("nao-possui"));
+
+// Função reutilizável de preenchimento dos dados do livro
+function aplicarDadosLivroFormulario(dados) {
+  if (!dados) return;
+
+  if (dados.titulo) {
+    document.getElementById("titulo").value = dados.titulo;
+  }
+  if (dados.autores) {
+    document.getElementById("autores").value = dados.autores;
+  }
+  if (dados.editora) {
+    document.getElementById("editora").value = dados.editora;
+  }
+  if (dados.ano_publicacao) {
+    document.getElementById("ano-publicacao").value = dados.ano_publicacao;
+  }
+  if (dados.isbn && possuiIsbnEl) {
+    possuiIsbnEl.checked = true;
+    naoPossuiIsbnEl.checked = false;
+    isbnInput.disabled = false;
+    isbnInput.value = dados.isbn;
+  }
+  if (dados.idioma) {
+    const selectIdioma = document.getElementById("idioma");
+    for (let opt of selectIdioma.options) {
+      if (opt.text.toLowerCase().includes(dados.idioma.toLowerCase())) {
+        selectIdioma.value = opt.value;
+        break;
+      }
+    }
+  }
+  if (dados.numero_paginas) {
+    const pagInput = document.getElementById("num-paginas");
+    if (pagInput) pagInput.value = dados.numero_paginas;
+  }
+  if (dados.sinopse) {
+    const sinopseInput = document.getElementById("sinopse");
+    if (sinopseInput) sinopseInput.value = dados.sinopse;
+  }
+
+  // Capa do livro
+  if (dados.foto_capa && !fotoBase64) {
+    const preview = document.getElementById("photo-preview");
+    const icon = document.getElementById("photo-icon");
+    if (preview) {
+      preview.src = dados.foto_capa;
+      preview.hidden = false;
+    }
+    if (icon) {
+      icon.style.display = "none";
+    }
+    fotoBase64 = dados.foto_capa;
+  }
+}
+
+// Fallback direto no navegador para consulta de ISBN se o backend falhar
+async function consultarIsbnFallback(isbnLimpo) {
+  // 1. Tenta BrasilAPI direto
+  try {
+    const res = await fetch(`https://brasilapi.com.br/api/isbn/v1/${isbnLimpo}`);
+    if (res.ok) {
+      const d = await res.json();
+      if (d.title) {
+        return {
+          titulo: d.title,
+          autores: (d.authors || []).join(", "),
+          editora: d.publisher || "",
+          ano_publicacao: d.year,
+          numero_paginas: d.page_count,
+          sinopse: d.synopsis || "",
+          foto_capa: `https://covers.openlibrary.org/b/isbn/${isbnLimpo}-M.jpg`
+        };
+      }
+    }
+  } catch (e) {
+    // segue para Open Library
+  }
+
+  // 2. Tenta Open Library direto
+  try {
+    const res = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbnLimpo}&format=json&jscmd=data`);
+    if (res.ok) {
+      const d = await res.json();
+      const info = d[`ISBN:${isbnLimpo}`];
+      if (info && info.title) {
+        return {
+          titulo: info.title,
+          autores: (info.authors || []).map(a => a.name).join(", "),
+          editora: (info.publishers || []).map(p => p.name).join(", "),
+          numero_paginas: info.number_of_pages,
+          ano_publicacao: info.publish_date ? parseInt(info.publish_date) || null : null,
+          foto_capa: info.cover ? (info.cover.medium || info.cover.large) : `https://covers.openlibrary.org/b/isbn/${isbnLimpo}-M.jpg`
+        };
+      }
+    }
+  } catch (e) {
+    // segue
+  }
+
+  return null;
+}
+
+// Função de consulta e auto-preenchimento por ISBN
+let ultimoIsbnConsultado = "";
+
+async function buscarLivroPorIsbn(forcar = false) {
+  if (naoPossuiIsbnEl.checked || !isbnInput.value.trim()) return;
+
+  const isbnLimpo = isbnInput.value.replace(/[^0-9X]/gi, "");
+  if (isbnLimpo.length < 10) {
+    if (isbnStatus) {
+      isbnStatus.textContent = "Digite os 10 ou 13 dígitos numéricos do ISBN.";
+      isbnStatus.style.color = "var(--color-red, #ff6b6b)";
+    }
+    return;
+  }
+
+  // Previne recarregamento desnecessário se já consultou exatamente esse ISBN
+  if (!forcar && isbnLimpo === ultimoIsbnConsultado) {
+    return;
+  }
+
+  if (isbnStatus) {
+    isbnStatus.textContent = "Consultando catálogo por ISBN...";
+    isbnStatus.style.color = "var(--text-muted)";
+  }
+  if (btnBuscarIsbn) {
+    btnBuscarIsbn.disabled = true;
+    btnBuscarIsbn.textContent = "Buscando...";
+  }
+
+  try {
+    let dados = null;
+    try {
+      dados = await apiRequest(`/livros/consulta-isbn/${isbnLimpo}`);
+    } catch (errApi) {
+      console.warn("Backend falhou no ISBN, tentando fallback direto:", errApi);
+      dados = await consultarIsbnFallback(isbnLimpo);
+      if (!dados) throw errApi;
+    }
+
+    aplicarDadosLivroFormulario(dados);
+    ultimoIsbnConsultado = isbnLimpo;
+
+    if (isbnStatus) {
+      isbnStatus.textContent = `Dados encontrados: "${dados.titulo}" (${dados.autores || "Autor informado"})`;
+      isbnStatus.style.color = "var(--color-green, #1fbf6b)";
+    }
+
+    if (window.BooklyToast) {
+      BooklyToast.success(`Livro "${dados.titulo}" localizado com sucesso!`, "ISBN Localizado");
+    }
+  } catch (erro) {
+    ultimoIsbnConsultado = "";
+    if (isbnStatus) {
+      isbnStatus.textContent = erro.message || "Livro não encontrado pelo ISBN. Preencha manualmente.";
+      isbnStatus.style.color = "var(--color-red, #ff6b6b)";
+    }
+  } finally {
+    if (btnBuscarIsbn) {
+      btnBuscarIsbn.disabled = false;
+      btnBuscarIsbn.textContent = "Buscar dados";
+    }
+  }
+}
+
+if (btnBuscarIsbn) {
+  btnBuscarIsbn.addEventListener("click", () => buscarLivroPorIsbn(true));
+}
+
+isbnInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    buscarLivroPorIsbn(true);
+  }
+});
+
+// Busca automática apenas se o usuário alterar o ISBN digitado
+isbnInput.addEventListener("input", () => {
+  const limpo = isbnInput.value.replace(/[^0-9X]/gi, "");
+  if (limpo !== ultimoIsbnConsultado && (limpo.length === 10 || limpo.length === 13)) {
+    buscarLivroPorIsbn(false);
+  }
+});
+
+// =========================================================
+// AUTOCOMPLETE DINÂMICO DE TÍTULO DO LIVRO
+// =========================================================
+const tituloInput = document.getElementById("titulo");
+const dropdownSugestoes = document.getElementById("titulo-sugestoes");
+const spinnerTitulo = document.getElementById("titulo-spinner");
+
+let timerAutocomplete = null;
+let indiceAtivoSugestao = -1;
+let sugestoesAtuais = [];
+
+function fecharDropdownSugestoes() {
+  if (dropdownSugestoes) {
+    dropdownSugestoes.hidden = true;
+    dropdownSugestoes.innerHTML = "";
+  }
+  indiceAtivoSugestao = -1;
+  sugestoesAtuais = [];
+}
+
+function renderizarSugestoes(sugestoes) {
+  if (!dropdownSugestoes) return;
+  dropdownSugestoes.innerHTML = "";
+  sugestoesAtuais = sugestoes;
+  indiceAtivoSugestao = -1;
+
+  if (!sugestoes || sugestoes.length === 0) {
+    fecharDropdownSugestoes();
+    return;
+  }
+
+  sugestoes.forEach((item, idx) => {
+    const li = document.createElement("li");
+    li.className = "autocomplete-item";
+    li.dataset.idx = idx;
+
+    const capaHtml = item.foto_capa
+      ? `<img src="${item.foto_capa}" class="autocomplete-capa-thumb" alt="Capa" onerror="this.style.display='none'">`
+      : `<div class="autocomplete-capa-thumb"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>`;
+
+    const tagOrigem = item.origem === "catalogo_bookly"
+      ? `<span class="autocomplete-tag">Catálogo Bookly</span>`
+      : `<span class="autocomplete-tag">Base Global</span>`;
+
+    const detalhes = [item.autores, item.editora, item.ano_publicacao ? `(${item.ano_publicacao})` : ""]
+      .filter(Boolean)
+      .join(" · ");
+
+    li.innerHTML = `
+      ${capaHtml}
+      <div class="autocomplete-info">
+        <div class="autocomplete-item-titulo">${item.titulo} ${tagOrigem}</div>
+        <div class="autocomplete-item-detalhes">${detalhes || "Autor não informado"}</div>
+      </div>
+    `;
+
+    li.addEventListener("click", () => {
+      selecionarSugestao(item);
+    });
+
+    dropdownSugestoes.appendChild(li);
+  });
+
+  dropdownSugestoes.hidden = false;
+}
+
+function selecionarSugestao(item) {
+  aplicarDadosLivroFormulario(item);
+  fecharDropdownSugestoes();
+  if (window.BooklyToast) {
+    BooklyToast.success(`Dados de "${item.titulo}" preenchidos automaticamente!`, "Livro Selecionado");
+  }
+}
+
+async function buscarSugestoesTitulo(termo) {
+  if (!termo || termo.length < 2) {
+    fecharDropdownSugestoes();
+    return;
+  }
+
+  if (spinnerTitulo) spinnerTitulo.hidden = false;
+
+  try {
+    const resultados = await apiRequest(`/livros/buscar-sugestoes?q=${encodeURIComponent(termo)}`);
+    renderizarSugestoes(resultados);
+  } catch (err) {
+    console.warn("Falha ao buscar sugestões:", err);
+  } finally {
+    if (spinnerTitulo) spinnerTitulo.hidden = true;
+  }
+}
+
+if (tituloInput) {
+  tituloInput.addEventListener("input", (e) => {
+    const termo = e.target.value.trim();
+    clearTimeout(timerAutocomplete);
+    if (termo.length < 2) {
+      fecharDropdownSugestoes();
+      return;
+    }
+    timerAutocomplete = setTimeout(() => {
+      buscarSugestoesTitulo(termo);
+    }, 250);
+  });
+
+  tituloInput.addEventListener("keydown", (e) => {
+    if (!dropdownSugestoes || dropdownSugestoes.hidden || sugestoesAtuais.length === 0) return;
+
+    const itens = dropdownSugestoes.querySelectorAll(".autocomplete-item");
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      indiceAtivoSugestao = (indiceAtivoSugestao + 1) % itens.length;
+      itens.forEach((el, i) => el.classList.toggle("is-active", i === indiceAtivoSugestao));
+      itens[indiceAtivoSugestao]?.scrollIntoView({ block: "nearest" });
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      indiceAtivoSugestao = (indiceAtivoSugestao - 1 + itens.length) % itens.length;
+      itens.forEach((el, i) => el.classList.toggle("is-active", i === indiceAtivoSugestao));
+      itens[indiceAtivoSugestao]?.scrollIntoView({ block: "nearest" });
+    } else if (e.key === "Enter") {
+      if (indiceAtivoSugestao >= 0 && sugestoesAtuais[indiceAtivoSugestao]) {
+        e.preventDefault();
+        selecionarSugestao(sugestoesAtuais[indiceAtivoSugestao]);
+      }
+    } else if (e.key === "Escape") {
+      fecharDropdownSugestoes();
+    }
+  });
+}
+
+// Fechar autocomplete ao clicar fora
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".autocomplete-group")) {
+    fecharDropdownSugestoes();
+  }
+});
 
 // =========================================================
 // Chips (passo 2): conservação / capa / raridade
@@ -248,9 +577,18 @@ async function carregarRecomendacaoDePreco() {
     document.getElementById("card-total").textContent = linha.total_itens;
 
     const max = Number(linha.preco_maximo) || 1;
-    document.getElementById("bar-minimo").style.height = `${(linha.preco_minimo / max) * 100}%`;
-    document.getElementById("bar-medio").style.height = `${(linha.preco_medio / max) * 100}%`;
+    const hMin = Math.max((linha.preco_minimo / max) * 100, 16);
+    const hMed = Math.max((linha.preco_medio / max) * 100, 22);
+    document.getElementById("bar-minimo").style.height = `${hMin}%`;
+    document.getElementById("bar-medio").style.height = `${hMed}%`;
     document.getElementById("bar-maximo").style.height = `100%`;
+
+    const elValMin = document.getElementById("val-bar-minimo");
+    const elValMed = document.getElementById("val-bar-medio");
+    const elValMax = document.getElementById("val-bar-maximo");
+    if (elValMin) elValMin.textContent = fmt(linha.preco_minimo);
+    if (elValMed) elValMed.textContent = fmt(linha.preco_medio);
+    if (elValMax) elValMax.textContent = fmt(linha.preco_maximo);
 
     // Sugere o preço médio como ponto de partida no campo final
     const precoFinalEl = document.getElementById("preco-final");
@@ -275,6 +613,157 @@ function atualizarDiferencaDePreco(precoMedio) {
   const diferenca = ((precoFinal - precoMedio) / precoMedio) * 100;
   const sinal = diferenca >= 0 ? "acima" : "abaixo";
   diffEl.textContent = `${Math.abs(diferenca).toFixed(0)}% ${sinal} da média da categoria`;
+}
+
+// =========================================================
+// BOOKLY AI: PRECIFICAÇÃO INTELIGENTE (OPCIONAL DO USUÁRIO)
+// =========================================================
+let ultimaRecomendacaoIa = null;
+
+async function solicitarRecomendacaoIa() {
+  const btnPedirIa = document.getElementById("btn-pedir-ia");
+  const aiLoading = document.getElementById("ai-loading");
+  const aiResult = document.getElementById("ai-result");
+  const aiLoadingText = document.getElementById("ai-loading-text");
+
+  btnPedirIa.disabled = true;
+  aiLoading.hidden = false;
+  aiResult.hidden = true;
+  if (aiLoadingText) aiLoadingText.textContent = "Analisando dados do livro e conservação com a Bookly AI...";
+
+  const payload = {
+    livro: {
+      titulo: document.getElementById("titulo").value.trim(),
+      autor: document.getElementById("autores").value.trim(),
+      editora: document.getElementById("editora").value.trim() || null,
+      id_categoria: Number(document.getElementById("categoria").value) || null,
+      idioma: document.getElementById("idioma").value || null,
+      ano_publicacao: Number(document.getElementById("ano-publicacao").value) || null,
+      isbn: naoPossuiIsbnEl.checked ? "" : isbnInput.value.trim(),
+    },
+    exemplar: {
+      conservacao: estado.conservacao,
+      tipo_capa: estado.tipoCapa,
+      raridade: estado.raridade,
+      quantidade_paginas: Number(document.getElementById("quantidade-paginas")?.value) || null,
+      observacoes: document.getElementById("observacoes").value.trim() || null,
+    },
+  };
+
+  try {
+    const resposta = await apiRequest("/estimativas/ia-precificar", {
+      method: "POST",
+      body: payload,
+    });
+
+    if (resposta && resposta.estimativa) {
+      ultimaRecomendacaoIa = {
+        ...resposta.estimativa,
+        origem: resposta.origem,
+      };
+      exibirRecomendacaoIa(ultimaRecomendacaoIa);
+      if (window.BooklyToast) {
+        BooklyToast.success("Sugestão de preço gerada com sucesso pela Bookly AI!");
+      }
+    } else {
+      throw new Error("Não foi possível gerar estimativa.");
+    }
+  } catch (erro) {
+    console.error("Erro na solicitação de IA:", erro);
+    if (window.BooklyToast) {
+      BooklyToast.warning("Não foi possível conectar à IA no momento. Você pode definir o preço manualmente.");
+    }
+  } finally {
+    btnPedirIa.disabled = false;
+    aiLoading.hidden = true;
+  }
+}
+
+function exibirRecomendacaoIa(est) {
+  const aiResult = document.getElementById("ai-result");
+  const aiPrecoVal = document.getElementById("ai-preco-val");
+  const aiFaixaVal = document.getElementById("ai-faixa-val");
+  const aiJustificativaVal = document.getElementById("ai-justificativa-val");
+  const aiBadgeConfianca = document.getElementById("ai-badge-confianca");
+  const aiBadgeOrigem = document.getElementById("ai-badge-origem");
+  const aiFatoresTags = document.getElementById("ai-fatores-tags");
+
+  aiResult.hidden = false;
+  aiPrecoVal.textContent = `R$ ${Number(est.preco_sugerido || 0).toFixed(2)}`;
+
+  if (est.faixa_preco && est.faixa_preco.minimo && est.faixa_preco.maximo) {
+    aiFaixaVal.textContent = `Faixa recomendada: R$ ${Number(est.faixa_preco.minimo).toFixed(2)} a R$ ${Number(est.faixa_preco.maximo).toFixed(2)}`;
+  } else {
+    aiFaixaVal.textContent = "Preço competitivo para venda rápida";
+  }
+
+  aiJustificativaVal.textContent = est.justificativa || "Avaliação baseada no estado de conservação do livro e dados da categoria.";
+
+  if (aiBadgeConfianca) {
+    const conf = (est.nivel_confianca || "Alta").toUpperCase();
+    aiBadgeConfianca.textContent = `Confiança ${conf}`;
+  }
+
+  if (aiBadgeOrigem) {
+    aiBadgeOrigem.textContent = est.origem === "ia" ? "Gemini 3.5" : "Heurística Bookly";
+  }
+
+  if (aiFatoresTags) {
+    aiFatoresTags.innerHTML = "";
+    if (Array.isArray(est.fatores_avaliados)) {
+      est.fatores_avaliados.forEach((f) => {
+        const span = document.createElement("span");
+        const impacto = (f.impacto || "").toLowerCase();
+        let cls = "ai-fator-tag";
+        if (impacto.includes("pos") || String(f.porcentagem).includes("+")) cls += " pos";
+        else if (impacto.includes("neg") || String(f.porcentagem).includes("-")) cls += " neg";
+        span.className = cls;
+        span.textContent = `${f.fator} (${f.porcentagem || f.impacto})`;
+        aiFatoresTags.appendChild(span);
+      });
+    }
+  }
+
+  const btnAdotar = document.getElementById("btn-adotar-preco-ia");
+  if (btnAdotar) {
+    btnAdotar.textContent = `Adotar R$ ${Number(est.preco_sugerido).toFixed(2)}`;
+  }
+}
+
+const btnPedirIaEl = document.getElementById("btn-pedir-ia");
+if (btnPedirIaEl) {
+  btnPedirIaEl.addEventListener("click", solicitarRecomendacaoIa);
+}
+
+const btnAdotarPrecoIaEl = document.getElementById("btn-adotar-preco-ia");
+if (btnAdotarPrecoIaEl) {
+  btnAdotarPrecoIaEl.addEventListener("click", () => {
+    if (ultimaRecomendacaoIa && ultimaRecomendacaoIa.preco_sugerido) {
+      const precoFinalEl = document.getElementById("preco-final");
+      precoFinalEl.value = Number(ultimaRecomendacaoIa.preco_sugerido).toFixed(2);
+
+      const precoMedioTxt = document.getElementById("card-medio").textContent;
+      const numMedio = Number(precoMedioTxt.replace("R$", "").replace(",", ".").trim()) || 0;
+      atualizarDiferencaDePreco(numMedio);
+
+      if (window.BooklyToast) {
+        BooklyToast.success(`Preço sugerido de R$ ${Number(ultimaRecomendacaoIa.preco_sugerido).toFixed(2)} adotado!`);
+      }
+    }
+  });
+}
+
+const btnAdotarDescIaEl = document.getElementById("btn-adotar-desc-ia");
+if (btnAdotarDescIaEl) {
+  btnAdotarDescIaEl.addEventListener("click", () => {
+    if (ultimaRecomendacaoIa && ultimaRecomendacaoIa.descricao_comercial) {
+      const obsEl = document.getElementById("observacoes");
+      obsEl.value = ultimaRecomendacaoIa.descricao_comercial;
+      if (window.BooklyToast) {
+        BooklyToast.info("Descrição comercial recomendada pela IA copiada para as observações do exemplar!");
+      }
+    }
+  });
 }
 
 // =========================================================
@@ -318,8 +807,25 @@ async function registrarLivro() {
         },
       })
     );
-    await Promise.all(criacoesDeItem);
+    const itensCriados = await Promise.all(criacoesDeItem);
 
+    // Se houve recomendação gerada pela IA, registra na tabela estimativa para o item criado
+    if (ultimaRecomendacaoIa && itensCriados.length > 0 && itensCriados[0].id_item) {
+      try {
+        await apiRequest("/estimativas", {
+          method: "POST",
+          body: {
+            id_item: itensCriados[0].id_item,
+            preco_estimado: ultimaRecomendacaoIa.preco_sugerido,
+            possivel_descricao: (ultimaRecomendacaoIa.justificativa || "").slice(0, 500),
+          },
+        });
+      } catch (errEst) {
+        console.warn("Aviso ao registrar estimativa no banco:", errEst);
+      }
+    }
+
+    sessionStorage.setItem("bookly_flash_sucesso", `Livro "${payloadLivro.nome}" cadastrado com sucesso!`);
     window.location.href = "../marketplace/marketplace.html";
   } catch (erro) {
     mostrarErro(erro.message);

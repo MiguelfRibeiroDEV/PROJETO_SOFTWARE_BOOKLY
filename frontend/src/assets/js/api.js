@@ -4,7 +4,10 @@
    reaproveitado por todas as páginas do front-end.
 ========================================================= */
 
-const API_BASE_URL = "http://127.0.0.1:5000";
+// Detecta dinamicamente se está rodando na AWS (IP público / domínio) ou em localhost
+const API_BASE_URL = (typeof window !== "undefined" && window.location && window.location.hostname && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1")
+  ? `${window.location.protocol}//${window.location.hostname}:5000`
+  : "http://127.0.0.1:5000";
 
 /**
  * Faz uma requisição para a API Flask e já trata JSON/erros.

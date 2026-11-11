@@ -50,7 +50,17 @@ class Item(db.Model):
     
 
     def deletar(self):
-        """DELETE: remove o item do banco."""
+        """DELETE: remove o item do banco, limpando dependências primeiro."""
+        from .carrinho_model import Carrinho
+        from .favorito_model import Favorito
+        from .pergunta_model import Pergunta
+        from .estimativa_model import Estimativa
+
+        Carrinho.query.filter_by(id_item=self.id_item).delete()
+        Favorito.query.filter_by(id_item=self.id_item).delete()
+        Pergunta.query.filter_by(id_item=self.id_item).delete()
+        Estimativa.query.filter_by(id_item=self.id_item).delete()
+
         db.session.delete(self)
         db.session.commit()
 
@@ -61,8 +71,8 @@ class Item(db.Model):
 
     @staticmethod
     def buscar_por_id(id_item):
-        """READ: busca um livreiro pelo id."""
-        return Item.query.get(id_item)
+        """READ: busca um item pelo id."""
+        return db.session.get(Item, id_item)
 
     @staticmethod
     def listar_disponiveis():

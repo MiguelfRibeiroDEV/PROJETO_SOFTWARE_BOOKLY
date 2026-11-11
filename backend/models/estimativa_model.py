@@ -8,7 +8,7 @@ class Estimativa(db.Model):
     __tablename__ = "estimativa"
 
     id_estimativa = db.Column(db.Integer, primary_key=True)
-    date_time = db.Column(db.DateTime, default=datetime.utcnow)
+    date_time = db.Column(db.DateTime, default=datetime.now)
     preco_estimado = db.Column(db.Numeric(10, 2))
     possivel_descricao = db.Column(db.Text)
 
@@ -37,8 +37,8 @@ class Estimativa(db.Model):
 
     @staticmethod
     def buscar_por_id(id_estimativa):
-        """READ: busca um livreiro pelo id."""
-        return Estimativa.query.get(id_estimativa)
+        """READ: busca uma estimativa pelo id."""
+        return db.session.get(Estimativa, id_estimativa)
 
     @staticmethod
     def listar_todos():

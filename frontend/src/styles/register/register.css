@@ -5,14 +5,15 @@ body {
 }
 
 .register-container {
-  background-color: #202225;
+  background-color: var(--bg-card);
   padding: 2.5rem;
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 640px;
   box-shadow: var(--shadow-card);
-  border: 1px solid #2a2e3d;
+  border: 1px solid var(--border-color);
   height: fit-content;
+  transition: var(--transition-theme);
 }
 
 .register-header {
@@ -25,8 +26,8 @@ body {
 }
 
 .welcome-text {
-  font-size: 0.85rem;
-  color: #9ca3af;
+  font-size: 0.88rem;
+  color: var(--text-muted);
   margin-top: 0.4rem;
 }
 
@@ -35,9 +36,14 @@ body {
   display: flex;
   gap: 10px;
   margin-bottom: 1.5rem;
-  background: #171922;
+  background: var(--bg-input-dark);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-pill);
   padding: 5px;
+}
+
+.tab-option {
+  flex: 1;
 }
 
 .tab-option input {
@@ -49,7 +55,7 @@ body {
   text-align: center;
   padding: 10px 16px;
   border-radius: var(--radius-pill);
-  color: #9ca3af;
+  color: var(--text-muted);
   font-weight: 600;
   font-size: 0.88rem;
   cursor: pointer;
@@ -64,13 +70,13 @@ body {
 .section-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #e5e7eb;
+  color: var(--text-main);
   margin-bottom: 1rem;
 }
 
 .divider {
   border: none;
-  border-top: 1px solid #2e3243;
+  border-top: 1px solid var(--border-color);
   margin: 1.5rem 0;
 }
 
@@ -92,27 +98,31 @@ body {
 }
 
 .input-group label {
-  font-size: 0.82rem;
-  color: #cfd3dc;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--text-main);
 }
 
 .input-group input,
 .input-group select {
-  background-color: #2a2e3d;
-  border: 1px solid #3a3f52;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 11px 14px;
-  color: #ffffff;
+  color: var(--text-main);
+  font-size: 0.92rem;
+  transition: var(--transition-theme);
 }
 
 .input-group input::placeholder {
-  color: #6b7280;
+  color: var(--text-placeholder);
 }
 
 .input-group input:focus,
 .input-group select:focus {
   outline: none;
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.2);
 }
 
 .btn-full {
@@ -121,16 +131,17 @@ body {
 }
 
 .form-error {
-  color: #ff6b6b;
-  font-size: 0.82rem;
+  color: var(--color-red, #ff6b6b);
+  font-size: 0.84rem;
   margin: -0.4rem 0 0.8rem;
+  font-weight: 500;
 }
 
 .register-footer {
   text-align: center;
   margin-top: 1.4rem;
-  font-size: 0.85rem;
-  color: #9ca3af;
+  font-size: 0.88rem;
+  color: var(--text-muted);
 }
 
 .register-footer a {

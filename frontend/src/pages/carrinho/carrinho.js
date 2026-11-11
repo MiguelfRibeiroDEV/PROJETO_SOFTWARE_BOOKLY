@@ -107,11 +107,30 @@ function desenharCarrinho(dados) {
 }
 
 async function carregarCarrinho() {
+  if (!idComprador || tipo !== "comprador") {
+    subtituloEl.textContent = "";
+    layoutEl.hidden = true;
+    vazioEl.hidden = false;
+    const h2 = vazioEl.querySelector("h2");
+    if (h2) h2.textContent = "Faça login para ver seu carrinho";
+    const p = vazioEl.querySelector("p");
+    if (p) p.textContent = "Entre com sua conta de comprador para gerenciar seus livros e compras.";
+    const btnExplorar = vazioEl.querySelector("a");
+    if (btnExplorar) {
+      btnExplorar.textContent = "Fazer login";
+      btnExplorar.href = "../login/login.html";
+    }
+    return;
+  }
+
   try {
     desenharCarrinho(await apiRequest(`/compradores/${idComprador}/carrinho`));
   } catch (erro) {
     subtituloEl.textContent = "";
-    mostrarMensagem(erro.message || "Não foi possível carregar o carrinho agora.", true);
+    const msgAmigavel = erro.message === "Failed to fetch"
+      ? "Não foi possível conectar ao servidor. Verifique se o backend está em execução."
+      : (erro.message || "Não foi possível carregar o carrinho agora.");
+    mostrarMensagem(msgAmigavel, true);
   }
 }
 
@@ -121,11 +140,11 @@ listaEl.addEventListener("click", async (event) => {
   botao.disabled = true;
   try {
     await apiRequest(`/compradores/${idComprador}/carrinho/${botao.dataset.idItem}`, { method: "DELETE" });
-    mostrarMensagem("");
+    BooklyToast.info("Item removido do carrinho.");
     await carregarCarrinho();
   } catch (erro) {
     botao.disabled = false;
-    mostrarMensagem(erro.message, true);
+    BooklyToast.error(erro.message);
   }
 });
 
@@ -135,14 +154,20 @@ btnFinalizar.addEventListener("click", async () => {
   btnFinalizar.textContent = "Finalizando...";
   try {
     const r = await apiRequest(`/compradores/${idComprador}/carrinho/finalizar`, { method: "POST" });
-    let texto = `${r.mensagem} Total: ${formatarPreco(r.total)}. Veja em "Meus pedidos".`;
+    let texto = `${r.mensagem} Total: ${formatarPreco(r.total)}.`;
     if (r.falhas.length > 0) {
       texto += ` Não foi possível comprar: ${r.falhas.map((f) => `${f.nome} (${f.motivo})`).join("; ")}.`;
     }
-    mostrarMensagem(texto, r.comprados.length === 0);
+    if (r.comprados.length > 0) {
+      BooklyToast.success(texto, "Compra Concluída!", {
+        action: { text: "Meus Pedidos", url: "../meus-pedidos/meus-pedidos.html" }
+      });
+    } else {
+      BooklyToast.error(texto, "Erro na Compra");
+    }
     await carregarCarrinho();
   } catch (erro) {
-    mostrarMensagem(erro.message, true);
+    BooklyToast.error(erro.message);
   } finally {
     btnFinalizar.textContent = textoOriginal;
     btnFinalizar.disabled = false;

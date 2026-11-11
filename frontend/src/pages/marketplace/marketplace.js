@@ -5,7 +5,8 @@ const template = document.getElementById("book-card-template");
 let todosOsLivros = [];
 let favoritosIds = new Set();
 let carrinhoIds = new Set();
-const filtros = { id_categoria: "", preco_max: 789, busca: "", conservacao: "", idioma: "" };
+const filtros = { id_categoria: "", preco_min: 0, preco_max: 999999, busca: "", conservacao: "", idioma: "" };
+let precoLimites = { min: 0, max: 999999 };
 
 const CORES_CAPA = ["#5b6ee1", "#e2637b", "#3fae7a", "#d1a13c", "#8158d6", "#3ea0c9"];
 
@@ -37,7 +38,19 @@ function renderizarLivros(lista) {
 
   if (lista.length === 0) {
     statusEl.hidden = false;
-    statusEl.textContent = "Nenhum livro encontrado com esses filtros.";
+    statusEl.innerHTML = `
+      <div style="padding: 36px 20px; text-align: center; color: var(--text-muted); background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border-color);">
+        <p style="font-size: 1.05rem; margin-bottom: 12px; color: var(--text-main); font-weight: 600;">Nenhum livro encontrado com esses filtros.</p>
+        <p style="font-size: 0.88rem; margin-bottom: 16px; color: var(--text-muted);">Tente ajustar as palavras-chave ou remover os filtros aplicados.</p>
+        <button type="button" class="btn btn-outline btn-sm" id="btn-limpar-filtros">Limpar todos os filtros</button>
+      </div>
+    `;
+    const btnLimpar = document.getElementById("btn-limpar-filtros");
+    if (btnLimpar) {
+      btnLimpar.addEventListener("click", () => {
+        limparTodosOsFiltros();
+      });
+    }
     return;
   }
   statusEl.hidden = true;
@@ -67,21 +80,34 @@ function renderizarLivros(lista) {
 }
 
 function aplicarFiltrosLocais() {
-  const buscaLower = filtros.busca.trim().toLowerCase();
+  const buscaLower = (filtros.busca || "").trim().toLowerCase();
+  const selectElem = document.getElementById("search-select");
+  const tipoBusca = selectElem ? selectElem.value : "all";
 
   const filtrados = todosOsLivros.filter((livro) => {
     const passaCategoria = !filtros.id_categoria || Number(livro.id_categoria) === Number(filtros.id_categoria);
-    const passaPreco = Number(livro.preco) <= Number(filtros.preco_max);
+    const preco = Number(livro.preco || 0);
+    const passaPreco = preco >= Number(filtros.preco_min) && preco <= Number(filtros.preco_max);
     const passaConservacao = !filtros.conservacao || livro.conservacao === filtros.conservacao;
     const passaIdioma = !filtros.idioma || livro.idioma === filtros.idioma;
-    const passaBusca =
-      !buscaLower ||
-      livro.nome.toLowerCase().includes(buscaLower) ||
-      livro.autor.toLowerCase().includes(buscaLower);
+    
+    let passaBusca = true;
+    if (buscaLower) {
+      const nome = (livro.nome || "").toLowerCase();
+      const autor = (livro.autor || "").toLowerCase();
+      if (tipoBusca === "titulo") {
+        passaBusca = nome.includes(buscaLower);
+      } else if (tipoBusca === "autor") {
+        passaBusca = autor.includes(buscaLower);
+      } else {
+        passaBusca = nome.includes(buscaLower) || autor.includes(buscaLower);
+      }
+    }
     return passaCategoria && passaPreco && passaConservacao && passaIdioma && passaBusca;
   });
 
   renderizarLivros(filtrados);
+  return filtrados;
 }
 
 async function carregarLivros() {
@@ -107,7 +133,8 @@ async function carregarCategoriasNoFiltro() {
     categorias.forEach((cat) => {
       const li = document.createElement("li");
       const a = document.createElement("a");
-      a.href = "#";
+      a.href = "javascript:void(0)";
+      a.setAttribute("role", "button");
       a.textContent = cat.nome;
       a.dataset.idCategoria = cat.id_categoria;
       li.appendChild(a);
@@ -155,20 +182,272 @@ document.getElementById("filtro-idioma").addEventListener("click", (event) => {
 });
 
 const slider = document.getElementById("preco-slider");
-slider.addEventListener("input", () => {
-  filtros.preco_max = slider.value;
-  document.getElementById("preco-max-label").textContent = `R$${slider.value}`;
+const precoMinInput = document.getElementById("preco-min-input");
+const precoMaxInput = document.getElementById("preco-max-input");
+const btnAplicarPreco = document.getElementById("btn-aplicar-preco");
+const btnLimparPreco = document.getElementById("btn-limpar-preco");
+
+function aplicarFiltroPreco(mostrarFeedback = true) {
+  let min = precoMinInput && precoMinInput.value !== "" ? Number(precoMinInput.value) : (precoLimites.min || 0);
+  let max = precoMaxInput && precoMaxInput.value !== "" ? Number(precoMaxInput.value) : (Number(slider ? slider.value : 500) || precoLimites.max || 500);
+
+  if (min < 0) min = 0;
+  if (max < min) {
+    const temp = min;
+    min = max;
+    max = temp;
+  }
+  if (precoMinInput) precoMinInput.value = min;
+  if (precoMaxInput) precoMaxInput.value = max;
+
+  filtros.preco_min = min;
+  filtros.preco_max = max;
+
+  if (slider) slider.value = Math.min(max, Number(slider.max || 500));
+  const maxLabel = document.getElementById("preco-max-label");
+  if (maxLabel) maxLabel.textContent = `R$${max}`;
+
+  const filtrados = aplicarFiltrosLocais();
+
+  if (mostrarFeedback && window.BooklyToast) {
+    BooklyToast.info(`Filtro aplicado: ${filtrados.length} livro(s) encontrado(s).`);
+  }
+}
+
+function limparFiltroPreco() {
+  // Limpa apenas os filtros da barra lateral, mantendo a busca da barra superior independente
+  filtros.id_categoria = "";
+  document.querySelectorAll("#filtro-categoria a").forEach((a) => a.classList.remove("active"));
+  const catTodos = document.querySelector('#filtro-categoria a[data-id-categoria=""]');
+  if (catTodos) catTodos.classList.add("active");
+
+  filtros.conservacao = "";
+  document.querySelectorAll("#filtro-condicao a").forEach((a) => a.classList.remove("active"));
+  const condTodos = document.querySelector('#filtro-condicao a[data-conservacao=""]');
+  if (condTodos) condTodos.classList.add("active");
+
+  filtros.idioma = "";
+  document.querySelectorAll("#filtro-idioma a").forEach((a) => a.classList.remove("active"));
+  const idioTodos = document.querySelector('#filtro-idioma a[data-idioma=""]');
+  if (idioTodos) idioTodos.classList.add("active");
+
+  const minDefault = precoLimites.min || 0;
+  const maxDefault = Math.max(500, precoLimites.max || 500);
+
+  filtros.preco_min = minDefault;
+  filtros.preco_max = maxDefault;
+
+  if (slider) {
+    slider.min = minDefault;
+    slider.max = maxDefault;
+    slider.value = maxDefault;
+  }
+  if (precoMinInput) precoMinInput.value = minDefault;
+  if (precoMaxInput) precoMaxInput.value = maxDefault;
+
+  const precoMinLabel = document.getElementById("preco-min-label");
+  const precoMaxLabel = document.getElementById("preco-max-label");
+  if (precoMinLabel) precoMinLabel.textContent = `R$${minDefault}`;
+  if (precoMaxLabel) precoMaxLabel.textContent = `R$${maxDefault}`;
+
   aplicarFiltrosLocais();
+
+  if (window.BooklyToast) {
+    BooklyToast.info("Filtros laterais resetados.");
+  }
+}
+
+function limparTodosOsFiltros() {
+  // 1. Limpar barra de busca superior e esconder botão X
+  const searchInput = document.getElementById("search-input");
+  const searchClearBtn = document.getElementById("search-clear-btn");
+  if (searchInput) searchInput.value = "";
+  if (searchClearBtn) searchClearBtn.hidden = true;
+  filtros.busca = "";
+
+  // 2. Resetar filtros da barra lateral para "Todos"
+  filtros.id_categoria = "";
+  document.querySelectorAll("#filtro-categoria a").forEach((a) => a.classList.remove("active"));
+  const catTodos = document.querySelector('#filtro-categoria a[data-id-categoria=""]');
+  if (catTodos) catTodos.classList.add("active");
+
+  filtros.conservacao = "";
+  document.querySelectorAll("#filtro-condicao a").forEach((a) => a.classList.remove("active"));
+  const condTodos = document.querySelector('#filtro-condicao a[data-conservacao=""]');
+  if (condTodos) condTodos.classList.add("active");
+
+  filtros.idioma = "";
+  document.querySelectorAll("#filtro-idioma a").forEach((a) => a.classList.remove("active"));
+  const idioTodos = document.querySelector('#filtro-idioma a[data-idioma=""]');
+  if (idioTodos) idioTodos.classList.add("active");
+
+  // 3. Resetar os DOIS campos de preço (Mín R$ e Máx R$), slider e labels
+  const minDefault = precoLimites.min || 0;
+  const maxDefault = Math.max(500, precoLimites.max || 500);
+
+  filtros.preco_min = minDefault;
+  filtros.preco_max = maxDefault;
+
+  if (precoMinInput) precoMinInput.value = minDefault;
+  if (precoMaxInput) precoMaxInput.value = maxDefault;
+
+  if (slider) {
+    slider.min = minDefault;
+    slider.max = maxDefault;
+    slider.value = maxDefault;
+  }
+
+  const precoMinLabel = document.getElementById("preco-min-label");
+  const precoMaxLabel = document.getElementById("preco-max-label");
+  if (precoMinLabel) precoMinLabel.textContent = `R$${minDefault}`;
+  if (precoMaxLabel) precoMaxLabel.textContent = `R$${maxDefault}`;
+
+  // 4. Reaplicar e mostrar todos os livros
+  aplicarFiltrosLocais();
+
+  if (window.BooklyToast) {
+    BooklyToast.info("Todos os filtros foram limpos.");
+  }
+}
+
+if (slider) {
+  slider.addEventListener("input", () => {
+    document.getElementById("preco-max-label").textContent = `R$${slider.value}`;
+    if (precoMaxInput) precoMaxInput.value = slider.value;
+  });
+
+  // Ao soltar o slider, aplica o filtro automaticamente
+  slider.addEventListener("change", () => {
+    aplicarFiltroPreco(false);
+  });
+}
+
+if (btnAplicarPreco) {
+  btnAplicarPreco.addEventListener("click", () => aplicarFiltroPreco(true));
+}
+
+if (btnLimparPreco) {
+  btnLimparPreco.addEventListener("click", limparFiltroPreco);
+}
+
+[precoMinInput, precoMaxInput].forEach((input) => {
+  if (input) {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        aplicarFiltroPreco(true);
+      }
+    });
+  }
 });
 
-document.getElementById("search-btn").addEventListener("click", buscar);
-document.getElementById("search-input").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") buscar();
-});
+async function carregarFaixaPrecoDoBanco() {
+  try {
+    const faixa = await apiRequest("/itens/faixa-preco");
+    const minReal = Math.floor(faixa.preco_min || 0);
+    const maxReal = Math.ceil(faixa.preco_max || 100);
+
+    // O máximo da barra do slider agora é de pelo menos 500 (ou o maior do banco se passar de 500)
+    const maxSlider = Math.max(500, maxReal);
+
+    precoLimites = { min: minReal, max: maxSlider };
+    filtros.preco_min = minReal;
+    filtros.preco_max = maxSlider;
+
+    slider.min = minReal;
+    slider.max = maxSlider;
+    slider.value = maxSlider;
+
+    document.getElementById("preco-min-label").textContent = `R$${minReal}`;
+    document.getElementById("preco-max-label").textContent = `R$${maxSlider}`;
+
+    if (precoMinInput) {
+      precoMinInput.min = minReal;
+      precoMinInput.placeholder = minReal;
+      precoMinInput.value = minReal;
+    }
+    if (precoMaxInput) {
+      precoMaxInput.placeholder = maxSlider;
+      precoMaxInput.value = maxSlider;
+    }
+  } catch (e) {
+    console.warn("Não foi possível carregar faixa de preço:", e);
+    slider.min = 0;
+    slider.max = 500;
+    slider.value = 500;
+    document.getElementById("preco-min-label").textContent = "R$0";
+    document.getElementById("preco-max-label").textContent = "R$500";
+    if (precoMinInput) precoMinInput.value = 0;
+    if (precoMaxInput) precoMaxInput.value = 500;
+  }
+}
+
+// =========================================================
+// BARRA DE PESQUISA SUPERIOR (Independente dos filtros laterais)
+// =========================================================
+const searchInput = document.getElementById("search-input");
+const searchClearBtn = document.getElementById("search-clear-btn");
+const searchSelect = document.getElementById("search-select");
+const searchBtn = document.getElementById("search-btn");
+
+function atualizarVisibilidadeClearBtn() {
+  if (searchClearBtn && searchInput) {
+    searchClearBtn.hidden = searchInput.value.trim().length === 0;
+  }
+}
 
 function buscar() {
-  filtros.busca = document.getElementById("search-input").value;
+  if (searchInput) filtros.busca = searchInput.value;
+  atualizarVisibilidadeClearBtn();
+  // Busca não reseta nem altera os filtros laterais
   aplicarFiltrosLocais();
+}
+
+function limparBusca() {
+  if (searchInput) {
+    searchInput.value = "";
+    searchInput.focus();
+  }
+  atualizarVisibilidadeClearBtn();
+  filtros.busca = "";
+  // Não afeta os filtros laterais (categoria, conservação, idioma e preços permanecem ativos)
+  aplicarFiltrosLocais();
+}
+
+if (searchInput) {
+  searchInput.addEventListener("input", () => {
+    atualizarVisibilidadeClearBtn();
+    filtros.busca = searchInput.value;
+    aplicarFiltrosLocais();
+  });
+
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      buscar();
+    } else if (e.key === "Escape") {
+      limparBusca();
+    }
+  });
+}
+
+if (searchClearBtn) {
+  searchClearBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    limparBusca();
+  });
+}
+
+if (searchBtn) {
+  searchBtn.addEventListener("click", buscar);
+}
+
+if (searchSelect) {
+  searchSelect.addEventListener("change", () => {
+    if (filtros.busca) {
+      aplicarFiltrosLocais();
+    }
+  });
 }
 
 // =========================================================
@@ -180,8 +459,9 @@ async function comprarItem(idItem, nomeLivro, botao) {
   const tipoUsuario = localStorage.getItem("bookly_usuario_tipo");
 
   if (!idComprador || tipoUsuario !== "comprador") {
-    alert("Faça login como comprador para finalizar a compra.");
-    window.location.href = "../login/login.html";
+    BooklyToast.warning("Faça login como comprador para finalizar a compra.", "Acesso Restrito", {
+      action: { text: "Fazer Login", url: "../login/login.html" }
+    });
     return;
   }
 
@@ -195,12 +475,12 @@ async function comprarItem(idItem, nomeLivro, botao) {
       body: { id_item: Number(idItem), id_comprador: Number(idComprador) },
     });
 
-    alert(`Compra de "${nomeLivro}" registrada com sucesso!`);
+    BooklyToast.success(`Compra de "${nomeLivro}" registrada com sucesso!`, "Pedido Confirmado");
     carrinhoIds.delete(Number(idItem));
     carregarLivros();
     carregarFavoritos();
   } catch (erro) {
-    alert(erro.message);
+    BooklyToast.error(erro.message, "Erro na Compra");
     botao.disabled = false;
     botao.textContent = textoOriginal;
   }
@@ -240,8 +520,9 @@ async function carregarFavoritos() {
 async function alternarFavorito(botao) {
   const idComprador = localStorage.getItem("bookly_usuario_id");
   if (localStorage.getItem("bookly_usuario_tipo") !== "comprador" || !idComprador) {
-    alert("Faça login como comprador para favoritar livros.");
-    window.location.href = "../login/login.html";
+    BooklyToast.warning("Faça login como comprador para favoritar livros.", "Acesso Restrito", {
+      action: { text: "Fazer Login", url: "../login/login.html" }
+    });
     return;
   }
 
@@ -252,16 +533,18 @@ async function alternarFavorito(botao) {
     if (jaFavorito) {
       await apiRequest(`/compradores/${idComprador}/favoritos/${idItem}`, { method: "DELETE" });
       favoritosIds.delete(idItem);
+      BooklyToast.info("Livro removido dos favoritos.");
     } else {
       await apiRequest(`/compradores/${idComprador}/favoritos`, {
         method: "POST",
         body: { id_item: idItem },
       });
       favoritosIds.add(idItem);
+      BooklyToast.success("Livro adicionado aos favoritos!", "Favoritos");
     }
     marcarCoracao(botao, !jaFavorito);
   } catch (erro) {
-    alert(erro.message);
+    BooklyToast.error(erro.message);
   }
 }
 
@@ -296,8 +579,9 @@ async function carregarCarrinho() {
 async function adicionarAoCarrinho(botao) {
   const idComprador = localStorage.getItem("bookly_usuario_id");
   if (localStorage.getItem("bookly_usuario_tipo") !== "comprador" || !idComprador) {
-    alert("Faça login como comprador para usar o carrinho.");
-    window.location.href = "../login/login.html";
+    BooklyToast.warning("Faça login como comprador para usar o carrinho.", "Acesso Restrito", {
+      action: { text: "Fazer Login", url: "../login/login.html" }
+    });
     return;
   }
 
@@ -312,8 +596,11 @@ async function adicionarAoCarrinho(botao) {
     await apiRequest(`/compradores/${idComprador}/carrinho`, { method: "POST", body: { id_item: idItem } });
     carrinhoIds.add(idItem);
     marcarCarrinho(botao, true);
+    BooklyToast.success("Item adicionado ao seu carrinho!", "Carrinho", {
+      action: { text: "Ver Carrinho", url: "../carrinho/carrinho.html" }
+    });
   } catch (erro) {
-    alert(erro.message);
+    BooklyToast.error(erro.message);
   } finally {
     botao.disabled = false;
   }
@@ -436,6 +723,7 @@ perguntaForm.addEventListener("submit", async (event) => {
   }
 });
 
+carregarFaixaPrecoDoBanco();
 carregarCategoriasNoFiltro();
 carregarLivros();
 carregarCarrinho();

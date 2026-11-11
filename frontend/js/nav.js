@@ -1,5 +1,7 @@
 // ========== NAV.JS — Menu lateral + Auth compartilhado ==========
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = (typeof window !== "undefined" && window.location && window.location.hostname && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1")
+    ? `${window.location.protocol}//${window.location.hostname}:5000`
+    : 'http://localhost:5000';
 const AUTH_KEY = 'bookly_user';
 
 // ----- FETCH helpers -----

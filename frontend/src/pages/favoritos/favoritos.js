@@ -98,9 +98,10 @@ async function removerFavorito(idItem) {
   const idComprador = pegarComprador();
   try {
     await apiRequest(`/compradores/${idComprador}/favoritos/${idItem}`, { method: "DELETE" });
+    BooklyToast.info("Item removido dos favoritos.");
     carregarFavoritos();
   } catch (erro) {
-    alert(erro.message);
+    BooklyToast.error(erro.message);
   }
 }
 
@@ -116,10 +117,10 @@ async function comprarFavorito(idItem, nome, botao) {
       method: "POST",
       body: { id_item: Number(idItem), id_comprador: Number(idComprador) },
     });
-    alert(`Compra de "${nome}" registrada com sucesso!`);
+    BooklyToast.success(`Compra de "${nome}" registrada com sucesso!`, "Pedido Confirmado");
     carregarFavoritos();
   } catch (erro) {
-    alert(erro.message);
+    BooklyToast.error(erro.message, "Erro na Compra");
     botao.disabled = false;
     botao.textContent = textoOriginal;
   }

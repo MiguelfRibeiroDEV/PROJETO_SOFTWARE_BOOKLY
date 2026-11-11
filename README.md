@@ -47,6 +47,9 @@ Com isso, espera-se aumentar a competitividade dos vendedores, reduzir erros de 
 * `item_model.py`
 * `livreiro_model.py`
 * `livro_model.py`
+* `carrinho_model.py`
+* `favorito_model.py`
+* `pergunta_model.py`
 * `database.py` *(Instância de inicialização do SQLAlchemy)*
 
 ####  CONTROLLERS (`backend/controllers/`)
@@ -56,6 +59,14 @@ Com isso, espera-se aumentar a competitividade dos vendedores, reduzir erros de 
 * `item_controller.py`
 * `livreiro_controller.py`
 * `livro_controller.py`
+* `carrinho_controller.py`
+* `dashboard_controller.py`
+* `catalogo_controller.py`
+* `pedido_controller.py`
+* `perfil_controller.py`
+* `pergunta_controller.py`
+* `relatorio_vendas_controller.py`
+* `recuperar_senha_controller.py`
 
 ####  SERVICES (`backend/services/`)
 * `categoria_service.py`
@@ -64,6 +75,26 @@ Com isso, espera-se aumentar a competitividade dos vendedores, reduzir erros de 
 * `item_service.py`
 * `livreiro_service.py`
 * `livro_service.py`
+* `autenticacao_service.py`
+* `carrinho_service.py`
+* `catalogo_service.py`
+* `dashboard_livreiro_service.py`
+* `favorito_service.py`
+* `pedido_service.py`
+* `perfil_service.py`
+* `pergunta_service.py`
+* `relatorio_vendas_service.py`
+* `recuperar_senha_service.py`
+
+####  UTILITÁRIOS E TRATAMENTO DE DADOS (`backend/utils/`)
+* `validadores.py` *(Algoritmo Módulo 11 de CPF, validações de e-mail, telefone, CEP, nomes e sanitização de dados)*
+
+####  BIBLIOTECAS COMPARTILHADAS DO FRONTEND (`frontend/src/assets/js/`)
+* `masks.js` *(Máscaras de digitação, validação de CPF e auto-preenchimento de endereço com ViaCEP)*
+* `theme.js` *(Gerenciador do Modo Escuro / Claro com persistência)*
+* `toast.js` *(Sistema moderno de notificações e modais que substitui alert() e confirm())*
+* `menu-usuario.js` *(Cabeçalho dinâmico do usuário com avatar e dropdown)*
+* `api.js` *(Cliente HTTP padronizado com tratamento de erros)*
 
 ## Como executar o projeto (passo a passo completo)
 
@@ -342,7 +373,103 @@ curl "http://localhost:5000/livreiros/1/relatorio-vendas?data_inicio=2026-10-01&
 ```bash
 curl "http://localhost:5000/livros/filtro?id_categoria=1&id_livreiro=1&preco_min=20&preco_max=100"
 ```
-### Telas FRONT-END
+### ✨ Novas Funcionalidades e Melhorias de Arquitetura
+
+21. **Tratamento, Higienização e Validação Uniforme de Dados**
+    - **Backend (`backend/utils/validadores.py`):**
+      - **CPF:** Máscara dinâmica em tempo real `000.000.000-00`, validação de 11 dígitos numéricos, rejeição de sequências repetidas (ex: `111.111.111-11`) e compatibilidade total para testes acadêmicos e números fictícios durante a apresentação do protótipo.
+      - **E-mail:** Validação com Regex estrito (`EMAIL_REGEX`), normalização em minúsculas e remoção de espaços em branco.
+      - **Telefone:** Validação de DDD e quantidade de dígitos (10 ou 11 dígitos), formatado e armazenado como `(XX) XXXXX-XXXX` ou `(XX) XXXX-XXXX`.
+      - **CEP:** Validação de 8 dígitos numéricos, formatado como `00000-000`.
+      - **Estado (UF):** Validação contra o conjunto oficial das 27 Unidades Federativas do Brasil (`UFS_VALIDAS`).
+      - **Nomes e Textos:** Remoção de espaços duplicados, limitação de caracteres e proteção contra poluição de dados nas tabelas `comprador` e `livreiro`.
+    - **Frontend (`frontend/src/assets/js/masks.js`):**
+      - Máscaras em tempo real nos campos de CPF, Telefone e CEP.
+      - Validação prévia de CPF (Módulo 11) e formato de e-mail antes da submissão no cadastro e perfil.
+      - **Integração com ViaCEP:** Consulta assíncrona automática ao digitar o CEP no Cadastro (`register.html`) e no Perfil (`perfil.html`), preenchendo rua, bairro, cidade e estado automaticamente e focando no campo de número.
+
+22. **Sistema de Temas: Modo Escuro e Modo Claro (Dark/Light Mode)**
+    - Implementação modular em `theme.js` com tokens semânticos em `base.css` (`[data-theme="dark"]` e `[data-theme="light"]`).
+    - **Alternância exclusiva pelo Menu Dropdown do usuário:** O botão solto no topo foi removido, centralizando o controle no dropdown do avatar com indicação visual dinâmica ("Modo claro" / "Modo escuro").
+    - **Contraste de Alta Legibilidade:** Ajuste rigoroso de contraste com WCAG AAA no modo claro, eliminando textos cinza-claro invisíveis no fundo branco e aplicando variáveis padronizadas em todas as telas (Marketplace, Login, Cadastro, Perfil, Catálogo, Relatório de Vendas).
+
+23. **Sistema de Feedback e Notificações (BooklyToast & BooklyModal)**
+    - Substituição completa de todos os diálogos bloqueantes e nativos do navegador (`window.alert` e `window.confirm`) por componentes visuais modernos (`toast.js` e `toast.css`).
+    - Suporte a mensagens informativas, avisos de sucesso, erros da API e modal de confirmação assíncrona (`await BooklyToast.confirm(...)`).
+    - Ações rápidas com links seguros (sem âncoras vazias `href="#"`).
+
+24. **Sistema Integrado de Filtros e Busca no Marketplace**
+    - **Filtro Lateral Completo:**
+      - Seleção dinâmica e combinada de **Categoria / Gênero**, **Condição / Estado de Conservação**, **Idioma** e **Faixa de Preço (BRL)**.
+      - **Leitura dinâmica do Banco:** Menor e maior preço lidos via `GET /itens/faixa-preco`, com régua do slider expandida para teto de pelo menos **R$ 500,00** (ou mais se houver livros de valor superior).
+      - **Botão "Aplicar filtro":** Aplica todos os critérios do menu lateral simultaneamente ao catálogo de livros com feedback toast instantâneo.
+      - **Botão "Limpar filtros":** Reseta as seleções do menu lateral (Categoria, Condição, Idioma e os 2 campos de preço Mín/Máx e Slider) de volta para os padrões sem limpar a busca da barra superior.
+    - **Barra de Pesquisa com Botão "X" de Limpeza Rápida:**
+      - Campo de busca superior com botão de limpeza rápida (`&times;`) que surge dinamicamente ao digitar e permite apagar o texto com um único clique ou pressionando `Escape`.
+      - **Independência dos Filtros:** Digitar ou limpar a busca superior não interfere nem reseta os filtros ativos no menu lateral (e vice-versa).
+    - **Botão "Limpar todos os filtros" no Estado Vazio:**
+      - Quando nenhum livro corresponde à combinação de filtros, o card do catálogo exibe botão para resetar **completamente** todos os campos: limpa a barra de pesquisa superior, redefine os dois campos de preço (`preco-min-input` e `preco-max-input`), restaura o slider para o valor máximo e seleciona "Todos" em categoria, condição e idioma.
+
+25. **Sistema de Recuperação de Senha ("Esqueceu a senha?") Integrado ao Banco**
+    - Fluxo seguro de redefinição de senha em duas etapas (`recuperar-senha.html`):
+      1. **Validação de Identidade:** O usuário informa seu e-mail cadastrado e seu CPF. A rota `POST /recuperar-senha/validar` confirma se a combinação existe na tabela `comprador` ou `livreiro`.
+      2. **Redefinição:** Confirmada a identidade, o sistema solicita a nova senha (mínimo de 6 caracteres) e confirmação, atualizando com segurança o banco via `POST /recuperar-senha/redefinir`.
+    - Link de acesso rápido integrado diretamente na tela de login (`login.html`).
+
+26. **Consulta Automática e Preenchimento por ISBN**
+    - **Backend (`ConsultarIsbnService` e rota `GET /livros/consulta-isbn/<isbn>`):**
+      - Sistema multi-provedor com fallback: consulta BrasilAPI e Open Library.
+      - Retorna título oficial, autor(es), editora, ano de publicação, quantidade de páginas, idioma, sinopse e foto da capa original.
+    - **Frontend (`cadastro-livro/cadastro.html` e `cadastro.js`):**
+      - Campo de ISBN inteligente com botão *"Buscar dados"*, busca automática ao atingir 10 ou 13 dígitos numéricos, com fallback resiliente diretamente no cliente.
+      - Controle de redundância: memoriza o último ISBN consultado para evitar recarregamentos repetidos ao clicar fora do campo (evento blur).
+      - Preenche instantaneamente todos os campos do formulário e insere o preview da foto oficial da capa.
+
+27. **Autocomplete Dinâmico em Tempo Real (Livros, Título e CEP/Endereço)**
+    - **Autocomplete de Livros e Títulos (`cadastro.html`):**
+      - Endpoint `GET /livros/buscar-sugestoes?q=<termo>` que combina o banco de dados local MySQL com a base global da Open Library.
+      - Ao digitar parte do título do livro (debounce de 250ms), um dropdown flutuante exibe miniaturas das capas, títulos, autores, editoras e anos.
+      - Selecionar uma opção preenche instantaneamente Título, Autor, Editora, Ano de publicação, Páginas, ISBN e Capa.
+      - Suporte completo a navegação via teclado (setas para cima/baixo, Enter e Escape).
+    - **Autocomplete de CEP e Endereço (`register.html` e `perfil.html`):**
+      - Função universal `BooklyMasks.configurarAutocompleteEndereco` em `masks.js`.
+      - Enquanto o usuário digita o CEP, um card/dropdown flutuante de sugestão surge com o logradouro e bairro correspondentes.
+      - Preenchimento em um clique ou ao completar os 8 dígitos numéricos, focando automaticamente no campo de número.
+      - Higienização e limitação de caracteres em todos os campos para prevenir poluição do banco de dados MySQL.
+
+28. **Bookly AI: Precificação Inteligente de Livros com Google Gemini**
+    - **Integração Real com IA Generativa (`gemini-3.5-flash-lite`):**
+      - Endpoint dedicado `POST /estimativas/ia-precificar` que orquestra a precificação inteligente.
+      - Envia os metadados do livro (título, autor, editora, ano, ISBN), as características físicas do exemplar (estado de conservação, tipo de capa, raridade e avarias detalhadas) e os valores de mercado da categoria registrados no MySQL.
+      - **Controle Total do Usuário (Sob Demanda):** A chamada à IA não é automática, preservando a cota gratuita da API e dando a escolha ao livreiro através do botão dedicado *"✨ Precificar com IA"*.
+      - **Adoção Rápida em 1 Clique:**
+        - Botão *"✓ Adotar este preço"* preenche instantaneamente o campo de preço final e recalcula a porcentagem de comparação com o mercado.
+        - Botão *"📝 Aproveitar descrição comercial da IA"* copia o texto persuasivo de venda gerado pela IA direto para o campo de observações do exemplar.
+      - **Persistência no Banco:** Ao concluir o cadastro, a estimativa sugerida pela IA é salva na tabela `estimativa` do MySQL e associada ao exemplar.
+      - **Fallback Heurístico Anti-Falhas:** Caso a cota gratuita expire, ocorra lentidão na internet ou erro na chave, o sistema aciona automaticamente o cálculo estatístico ponderado local com base no MySQL, garantindo que o protótipo nunca trave nem apresente erro para os professores.
+
+29. **Suíte de Testes Automatizados de Integração e Unidade (`test_api.py`)**
+    - **26 testes automatizados** cobrindo todo o ciclo da aplicação:
+      1. Home e status da API
+      2. Autenticação por e-mail, login e nome de usuário
+      3. Listagem de categorias e catálogo
+      4. Stored procedures (busca com filtros, preço médio, ranking de vendas e dashboard)
+      5. Relatório de vendas por categoria e período
+      6. Validação de duplicidade de registros
+      7. Ciclo completo: criação de livro → exemplar → carrinho → favoritos → perguntas → finalização de pedido
+      8. Rejeição estrita de dados malformados (CPF com checksum inválido, e-mails numéricos e telefones fora do padrão)
+      9. Sanitização e gravação padronizada no perfil
+      10. Faixa dinâmica de menor e maior preço do banco (`GET /itens/faixa-preco`)
+      11. Validação de e-mail e CPF na recuperação de senha (`POST /recuperar-senha/validar`)
+      12. Redefinição e login com a nova senha (`POST /recuperar-senha/redefinir`)
+      13. Consulta de livro por ISBN na API externa com fallback (`GET /livros/consulta-isbn/<isbn>`)
+      14. Busca de sugestões de livros para autocomplete (`GET /livros/buscar-sugestoes?q=...`)
+      15. Precificação inteligente com Bookly AI e fallback estatístico (`POST /estimativas/ia-precificar`)
+
+```bash
+# Para executar a bateria completa de 26 testes automatizados:
+python backend/test_api.py
+```
 
 
 

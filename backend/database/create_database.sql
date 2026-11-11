@@ -2,8 +2,9 @@
 -- BANCO DE DADOS: BOOKLY_DB
 -- =========================================================
 DROP DATABASE IF EXISTS bookly_db;
-CREATE DATABASE bookly_db;
+CREATE DATABASE bookly_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE bookly_db;
+SET NAMES utf8mb4;
 
 -- =========================================================
 -- 1. Entidade LIVREIRO (Vendedor)

@@ -226,6 +226,7 @@ formEditar.addEventListener("submit", async (event) => {
     });
 
     fecharModal();
+    BooklyToast.success("Anúncio atualizado com sucesso!");
     carregarCatalogo();
   } catch (erro) {
     modalErro.hidden = false;
@@ -241,14 +242,19 @@ formEditar.addEventListener("submit", async (event) => {
 // DELETE /livreiros/<id>/catalogo/<id_item> -> Controller -> RemoverAnuncioService -> Models
 // =========================================================
 async function excluirAnuncio(idItem, nome) {
-  const confirmou = confirm(`Remover "${nome}" do marketplace? Essa ação não pode ser desfeita.`);
+  const confirmou = await BooklyToast.confirm(
+    "Remover anúncio",
+    `Deseja realmente remover <strong>"${nome}"</strong> do marketplace? Essa ação não pode ser desfeita.`,
+    { confirmText: "Remover", cancelText: "Cancelar", danger: true }
+  );
   if (!confirmou) return;
 
   try {
     await apiRequest(`/livreiros/${idLivreiro}/catalogo/${idItem}`, { method: "DELETE" });
+    BooklyToast.success(`"${nome}" removido com sucesso.`);
     carregarCatalogo();
   } catch (erro) {
-    alert(erro.message);
+    BooklyToast.error(erro.message);
   }
 }
 

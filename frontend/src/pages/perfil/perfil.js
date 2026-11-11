@@ -22,6 +22,10 @@ function mostrarMensagem(texto, erro = false) {
   msgEl.hidden = false;
   clearTimeout(timerMsg);
   timerMsg = setTimeout(() => { msgEl.hidden = true; }, 5000);
+  if (window.BooklyToast) {
+    if (erro) BooklyToast.error(texto);
+    else BooklyToast.success(texto);
+  }
 }
 
 // ---------- formatação ----------
@@ -119,6 +123,19 @@ function aplicarPerfil(perfil) {
   if (perfil.foto_perfil) localStorage.setItem("bookly_usuario_foto", perfil.foto_perfil);
   else localStorage.removeItem("bookly_usuario_foto");
   if (window.BooklyMenu) window.BooklyMenu.atualizar();
+
+  // Inicializa o Autocomplete de CEP e endereço no perfil
+  if (window.BooklyMasks && window.BooklyMasks.configurarAutocompleteEndereco) {
+    BooklyMasks.configurarAutocompleteEndereco({
+      cep: document.getElementById("endereco_cep"),
+      rua: document.getElementById("endereco_rua"),
+      bairro: document.getElementById("endereco_bairro"),
+      cidade: document.getElementById("endereco_cidade"),
+      estado: document.getElementById("endereco_estado"),
+      numero: document.getElementById("endereco_numero"),
+      complemento: document.getElementById("endereco_complemento"),
+    });
+  }
 }
 
 async function enviarAtualizacao(dados) {
@@ -144,6 +161,29 @@ async function carregarPerfil() {
   }
 }
 
+// Auto-completar endereço via ViaCEP no perfil
+const cepPerfilInput = document.getElementById("endereco_cep");
+async function buscarCepPerfil() {
+  if (!cepPerfilInput) return;
+  const limpo = cepPerfilInput.value.replace(/\D/g, "");
+  if (limpo.length !== 8) return;
+
+  const dados = await (window.BooklyMasks ? window.BooklyMasks.consultarViaCEP(limpo) : null);
+  if (dados) {
+    if (dados.rua) document.getElementById("endereco_rua").value = dados.rua;
+    if (dados.bairro) document.getElementById("endereco_bairro").value = dados.bairro;
+    if (dados.cidade) document.getElementById("endereco_cidade").value = dados.cidade;
+    if (dados.estado) document.getElementById("endereco_estado").value = dados.estado.toUpperCase();
+    document.getElementById("endereco_numero").focus();
+  }
+}
+if (cepPerfilInput) {
+  cepPerfilInput.addEventListener("blur", buscarCepPerfil);
+  cepPerfilInput.addEventListener("input", () => {
+    if (cepPerfilInput.value.replace(/\D/g, "").length === 8) buscarCepPerfil();
+  });
+}
+
 // ---------- salvar dados ----------
 document.getElementById("form-perfil").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -154,6 +194,23 @@ document.getElementById("form-perfil").addEventListener("submit", async (event) 
 
   if (!dados.primeiro_nome) return mostrarMensagem("Informe o seu nome.", true);
   if (!dados.usuario) return mostrarMensagem("Informe o nome de usuário.", true);
+
+  // Validação de telefone no perfil (se preenchido, mínimo 10 dígitos)
+  const telLimpo = (dados.telefone || "").replace(/\D/g, "");
+  if (telLimpo.length > 0 && (telLimpo.length < 10 || telLimpo.length > 11)) {
+    return mostrarMensagem("Telefone inválido. Informe o DDD e o número completo.", true);
+  }
+
+  // Validação de CEP no perfil (se preenchido, 8 dígitos válidos)
+  const cepLimpo = (dados.endereco_cep || "").replace(/\D/g, "");
+  if (cepLimpo.length > 0 && (window.BooklyMasks ? !window.BooklyMasks.validarCEP(cepLimpo) : cepLimpo.length !== 8)) {
+    return mostrarMensagem("CEP inválido. O CEP deve conter 8 dígitos numéricos válidos.", true);
+  }
+
+  // Sanitização de dados de endereço e strings
+  if (dados.endereco_estado) {
+    dados.endereco_estado = dados.endereco_estado.toUpperCase();
+  }
 
   botao.disabled = true;
   try {

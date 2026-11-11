@@ -1,4 +1,9 @@
+import re
 from models.livreiro_model import Livreiro
+from utils.validadores import (
+    validar_cpf, tratar_cpf, tratar_email, tratar_telefone, tratar_cep, tratar_estado,
+    tratar_usuario, tratar_nome, tratar_texto_simples
+)
 
 class CriarLivreiroService:
     def executar(self, dados):
@@ -8,31 +13,49 @@ class CriarLivreiroService:
             if not dados.get(campo):
                 raise ValueError(f"O campo '{campo}' é obrigatório.")
 
-        livreiro_com_email = Livreiro.buscar_por_email(dados["email"])
-        if livreiro_com_email:
+        cpf_limpo = tratar_cpf(dados.get("cpf"))
+
+        email_limpo = tratar_email(dados["email"])
+        telefone_formatado = tratar_telefone(dados.get("telefone"))
+        cep_formatado = tratar_cep(dados.get("endereco_cep") or dados.get("cep"))
+        primeiro_nome = tratar_nome(dados["primeiro_nome"], "Primeiro nome")
+        segundo_nome = tratar_nome(dados.get("segundo_nome"), "Sobrenome")
+        usuario_limpo = tratar_usuario(dados["usuario"])
+        login_limpo = str(dados["login"]).strip()
+        if not login_limpo or len(login_limpo) < 3:
+            raise ValueError("O login deve ter pelo menos 3 caracteres.")
+
+        cidade_bruta = str(dados.get("endereco_cidade") or dados.get("cidade") or "").split("/")[0]
+
+        if Livreiro.buscar_por_email(email_limpo):
             raise ValueError("Já existe um livreiro cadastrado com este e-mail.")
 
-        livreiro_com_cpf = Livreiro.buscar_por_cpf(dados["cpf"])
-        if livreiro_com_cpf:
+        if Livreiro.buscar_por_cpf(cpf_limpo):
             raise ValueError("Já existe um livreiro cadastrado com este CPF.")
 
+        if Livreiro.buscar_por_login(login_limpo):
+            raise ValueError("Já existe um livreiro cadastrado com este login.")
+
+        if Livreiro.buscar_por_usuario(usuario_limpo):
+            raise ValueError("Já existe um livreiro cadastrado com este nome de usuário.")
+
         livreiro = Livreiro(
-            login=dados["login"],
+            login=login_limpo,
             senha=dados["senha"],
-            usuario=dados["usuario"],
-            cpf=dados["cpf"],
-            email=dados["email"],
-            primeiro_nome=dados["primeiro_nome"],
-            segundo_nome=dados.get("segundo_nome"),
-            telefone=dados.get("telefone"),
-            data_nascimento=dados.get("data_nascimento"),
-            endereco_rua=dados.get("endereco_rua"),
-            endereco_numero=dados.get("endereco_numero"),
-            endereco_complemento=dados.get("endereco_complemento"),
-            endereco_bairro=dados.get("endereco_bairro"),
-            endereco_cidade=dados.get("endereco_cidade"),
-            endereco_estado=dados.get("endereco_estado"),
-            endereco_cep=dados.get("endereco_cep"),
+            usuario=usuario_limpo,
+            cpf=cpf_limpo,
+            email=email_limpo,
+            primeiro_nome=primeiro_nome,
+            segundo_nome=segundo_nome,
+            telefone=telefone_formatado,
+            data_nascimento=dados.get("data_nascimento") or None,
+            endereco_rua=tratar_texto_simples(dados.get("endereco_rua") or dados.get("rua"), 150),
+            endereco_numero=tratar_texto_simples(dados.get("endereco_numero") or dados.get("numero"), 10),
+            endereco_complemento=tratar_texto_simples(dados.get("endereco_complemento") or dados.get("complemento"), 100),
+            endereco_bairro=tratar_texto_simples(dados.get("endereco_bairro") or dados.get("bairro"), 100),
+            endereco_cidade=tratar_texto_simples(cidade_bruta, 100),
+            endereco_estado=tratar_estado(dados.get("endereco_estado") or dados.get("estado")),
+            endereco_cep=cep_formatado,
         )
 
         livreiro.salvar()

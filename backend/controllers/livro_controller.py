@@ -9,10 +9,35 @@ from services.livro_service import (
     BuscarLivroPorIdService,
     AtualizarLivroService,
     DeletarLivroService,
+    ConsultarIsbnService,
+    BuscarSugestoesLivroService,
 )
 from models.database import db
 
 livro_controller = Blueprint("livro_controller", __name__)
+
+
+@livro_controller.get("/livros/buscar-sugestoes")
+def buscar_sugestoes_livros():
+    termo = request.args.get("q", "").strip()
+    try:
+        service = BuscarSugestoesLivroService()
+        resultados = service.executar(termo)
+        return jsonify(resultados), 200
+    except Exception as erro:
+        return jsonify({"erro": str(erro)}), 500
+
+
+@livro_controller.get("/livros/consulta-isbn/<path:isbn>")
+def consultar_isbn(isbn):
+    try:
+        service = ConsultarIsbnService()
+        dados = service.executar(isbn)
+        return jsonify(dados), 200
+    except ValueError as erro:
+        return jsonify({"erro": str(erro)}), 404
+    except Exception as erro:
+        return jsonify({"erro": "Erro ao consultar serviço de ISBN: " + str(erro)}), 500
 
 
 @livro_controller.post("/livros")

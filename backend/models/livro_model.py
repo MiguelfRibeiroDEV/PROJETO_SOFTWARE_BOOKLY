@@ -44,10 +44,11 @@ class Livro(db.Model):
         return self
     
     def deletar(self):
-        """DELETE: remove o livro do banco."""
+        """DELETE: remove o livro do banco e os seus itens associados."""
+        for item in list(self.itens):
+            item.deletar()
         db.session.delete(self)
         db.session.commit()
-
 
     @staticmethod
     def listar_todos():
@@ -67,7 +68,7 @@ class Livro(db.Model):
     @staticmethod
     def buscar_por_id(id_livro):
         """READ: busca um livro pelo id."""
-        return Livro.query.get(id_livro) 
+        return db.session.get(Livro, id_livro) 
 
     def to_dict(self):
         return {

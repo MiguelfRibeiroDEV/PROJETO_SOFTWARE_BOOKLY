@@ -6,6 +6,7 @@
   <title>Criar Conta - Bookly</title>
   <link rel="stylesheet" href="../../styles/base/base.css">
   <link rel="stylesheet" href="../../styles/register/register.css">
+  <script src="../../assets/js/theme.js"></script>
 </head>
 <body>
 
@@ -54,22 +55,30 @@
 
         <div class="input-group">
           <label for="senha">Senha *</label>
-          <input type="password" id="senha" placeholder="Mínimo 6 caracteres" required minlength="6">
+          <div class="input-password-wrap">
+            <input type="password" id="senha" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
+            <button type="button" class="btn-toggle-pass" id="btn-toggle-pass-reg" aria-label="Mostrar ou ocultar senha" title="Mostrar/ocultar senha">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div class="input-group">
           <label for="cpf">CPF *</label>
-          <input type="text" id="cpf" placeholder="somente números" required maxlength="11">
+          <input type="text" id="cpf" placeholder="000.000.000-00" required maxlength="14" autocomplete="off">
         </div>
 
         <div class="input-group">
           <label for="email">E-mail *</label>
-          <input type="email" id="email" placeholder="seu@email.com" required>
+          <input type="email" id="email" placeholder="seu@email.com" required maxlength="150" autocomplete="email">
         </div>
 
         <div class="input-group">
           <label for="telefone">Telefone</label>
-          <input type="tel" id="telefone" placeholder="(00) 00000-0000">
+          <input type="tel" id="telefone" placeholder="(00) 00000-0000" maxlength="15" autocomplete="tel">
         </div>
       </div>
 
@@ -84,7 +93,8 @@
       <div class="form-grid">
         <div class="input-group">
           <label for="cep">CEP</label>
-          <input type="text" id="cep" placeholder="00000-000">
+          <input type="text" id="cep" placeholder="00000-000" maxlength="9" autocomplete="postal-code">
+          <small id="cep-status" class="campo-status" style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:4px;"></small>
         </div>
 
         <div class="input-group">
@@ -110,22 +120,22 @@
 
         <div class="input-group">
           <label for="cidade">Cidade</label>
-          <input type="text" id="cidade" placeholder="Sua cidade">
+          <input type="text" id="cidade" placeholder="Sua cidade" maxlength="100">
         </div>
 
         <div class="input-group">
           <label for="bairro">Bairro</label>
-          <input type="text" id="bairro" placeholder="Seu bairro">
+          <input type="text" id="bairro" placeholder="Seu bairro" maxlength="100">
         </div>
 
         <div class="input-group">
           <label for="rua">Rua</label>
-          <input type="text" id="rua" placeholder="Nome da rua">
+          <input type="text" id="rua" placeholder="Nome da rua" maxlength="100">
         </div>
 
         <div class="input-group">
           <label for="numero">Número</label>
-          <input type="text" id="numero" placeholder="Nº">
+          <input type="text" id="numero" placeholder="Nº" maxlength="10">
         </div>
       </div>
 
@@ -140,6 +150,8 @@
   </div>
 
   <script src="../../assets/js/api.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/masks.js"></script>
   <script src="register.js"></script>
 </body>
 </html>

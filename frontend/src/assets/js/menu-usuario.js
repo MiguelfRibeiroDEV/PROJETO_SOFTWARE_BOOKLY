@@ -22,16 +22,17 @@
     "bookly_livreiro_id",
   ];
 
-  // Opções do menu por tipo de conta. Para criar uma nova opção, basta
-  // acrescentar uma linha aqui (rótulo + caminho da página).
+  // Opções do menu por tipo de conta.
   const OPCOES = {
     comprador: [
+      { rotulo: "Explorar Marketplace", caminho: "pages/marketplace/marketplace.html" },
       { rotulo: "Meu perfil", caminho: "pages/perfil/perfil.html" },
       { rotulo: "Meus pedidos", caminho: "pages/meus-pedidos/meus-pedidos.html" },
       { rotulo: "Favoritos", caminho: "pages/favoritos/favoritos.html" },
       { rotulo: "Carrinho", caminho: "pages/carrinho/carrinho.html" },
     ],
     livreiro: [
+      { rotulo: "Explorar Marketplace", caminho: "pages/marketplace/marketplace.html" },
       { rotulo: "Meu perfil", caminho: "pages/perfil/perfil.html" },
       { rotulo: "Painel de vendas", caminho: "pages/painel-vendedor/painel.html" },
       { rotulo: "Meu catálogo", caminho: "pages/meu-catalogo/meu-catalogo.html" },
@@ -120,14 +121,101 @@
   separador.className = "user-dropdown-sep";
   dropdown.appendChild(separador);
 
+  // Opção rápida de alternar tema exclusivamente no dropdown
+  const itemTema = document.createElement("button");
+  itemTema.type = "button";
+  itemTema.className = "user-dropdown-item";
+  
+  function atualizarTextoTema() {
+    const tema = (window.BooklyTheme ? window.BooklyTheme.get() : "dark");
+    if (tema === "dark") {
+      itemTema.innerHTML = `
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <span>Modo claro</span>
+      `;
+    } else {
+      itemTema.innerHTML = `
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <span>Modo escuro</span>
+      `;
+    }
+  }
+
+  atualizarTextoTema();
+  window.addEventListener("bookly_theme_changed", atualizarTextoTema);
+
+  itemTema.addEventListener("click", () => {
+    if (window.BooklyTheme) {
+      window.BooklyTheme.toggle();
+      atualizarTextoTema();
+    }
+  });
+  dropdown.appendChild(itemTema);
+
   const sair = document.createElement("button");
   sair.type = "button";
   sair.className = "user-dropdown-item user-dropdown-sair";
   sair.textContent = "Sair";
   dropdown.appendChild(sair);
 
+  // Remove eventuais atalhos legados
+  nav.querySelectorAll(".nav-shortcut").forEach((el) => el.remove());
+
+  // Se não estivermos na página do Marketplace, garante o botão de retorno visível e claro
+  const naPaginaMarketplace = window.location.pathname.endsWith("marketplace.html");
+  if (!naPaginaMarketplace && !nav.querySelector(".btn-voltar-marketplace")) {
+    const btnVoltar = document.createElement("a");
+    btnVoltar.className = "btn-voltar-marketplace";
+    btnVoltar.href = RAIZ + "pages/marketplace/marketplace.html";
+    btnVoltar.innerHTML = `
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span>Marketplace</span>
+    `;
+    nav.insertBefore(btnVoltar, nav.firstChild);
+  }
+
+  // Ícone discreto de carrinho apenas para compradores (e não na própria página do carrinho)
+  const naPaginaCarrinho = window.location.pathname.endsWith("carrinho.html");
+  if (tipo === "comprador" && !naPaginaCarrinho && !nav.querySelector(".nav-cart-btn")) {
+    const btnCart = document.createElement("a");
+    btnCart.className = "nav-cart-btn";
+    btnCart.href = RAIZ + "pages/carrinho/carrinho.html";
+    btnCart.setAttribute("aria-label", "Meu Carrinho");
+    btnCart.title = "Meu Carrinho";
+    btnCart.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+      </svg>
+    `;
+    nav.appendChild(btnCart);
+  }
+
   caixa.append(botao, dropdown);
   nav.appendChild(caixa);
+
+  // Garante que o theme.js seja carregado caso a página ainda não o tenha
+  if (!window.BooklyTheme) {
+    const scriptTheme = document.createElement("script");
+    scriptTheme.src = RAIZ + "assets/js/theme.js";
+    document.head.appendChild(scriptTheme);
+  }
 
   // ---------- preenchimento (nome, e-mail, foto/inicial) ----------
   function atualizar() {

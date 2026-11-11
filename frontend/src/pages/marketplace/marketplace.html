@@ -6,6 +6,7 @@
   <title>Bookly - O seu sebo online</title>
   <link rel="stylesheet" href="../../styles/base/base.css">
   <link rel="stylesheet" href="../../styles/marketplace/marketplace.css">
+  <script src="../../assets/js/theme.js"></script>
 </head>
 <body>
 
@@ -17,12 +18,15 @@
 
     <div class="search-container">
       <div class="search-box">
-        <select class="search-select">
+        <select class="search-select" id="search-select">
           <option value="all">All</option>
           <option value="titulo">Título</option>
           <option value="autor">Autor</option>
         </select>
-        <input type="text" id="search-input" placeholder="Search">
+        <div class="search-input-wrap">
+          <input type="text" id="search-input" placeholder="Search" autocomplete="off">
+          <button type="button" class="search-clear-btn" id="search-clear-btn" aria-label="Limpar pesquisa" title="Limpar pesquisa" hidden>&times;</button>
+        </div>
         <button class="search-btn" id="search-btn" aria-label="Buscar">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="white" stroke-width="2"/><path d="M21 21l-4-4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
@@ -45,31 +49,31 @@
       <div class="filter-group">
         <h4>Gênero / Categoria</h4>
         <ul id="filtro-categoria" class="filter-list">
-          <li><a href="#" data-id-categoria="">Todos</a></li>
+          <li><a href="javascript:void(0)" role="button" data-id-categoria="" class="active">Todos</a></li>
         </ul>
       </div>
 
       <div class="filter-group">
         <h4>Condição</h4>
         <ul id="filtro-condicao" class="grid-list">
-          <li><a href="#" data-conservacao="">Todos</a></li>
-          <li><a href="#" data-conservacao="Perfeito">Perfeito</a></li>
-          <li><a href="#" data-conservacao="Bom">Bom</a></li>
-          <li><a href="#" data-conservacao="Médio">Médio</a></li>
-          <li><a href="#" data-conservacao="Ruim">Ruim</a></li>
-          <li><a href="#" data-conservacao="Péssimo">Péssimo</a></li>
+          <li><a href="javascript:void(0)" role="button" data-conservacao="" class="active">Todos</a></li>
+          <li><a href="javascript:void(0)" role="button" data-conservacao="Perfeito">Perfeito</a></li>
+          <li><a href="javascript:void(0)" role="button" data-conservacao="Bom">Bom</a></li>
+          <li><a href="javascript:void(0)" role="button" data-conservacao="Médio">Médio</a></li>
+          <li><a href="javascript:void(0)" role="button" data-conservacao="Ruim">Ruim</a></li>
+          <li><a href="javascript:void(0)" role="button" data-conservacao="Péssimo">Péssimo</a></li>
         </ul>
       </div>
 
       <div class="filter-group">
         <h4>Idioma</h4>
         <ul id="filtro-idioma">
-          <li><a href="#" data-idioma="">Todos</a></li>
-          <li><a href="#" data-idioma="Português (BR)">Português(br)</a></li>
-          <li><a href="#" data-idioma="Inglês">Inglês</a></li>
-          <li><a href="#" data-idioma="Espanhol">Espanhol</a></li>
-          <li><a href="#" data-idioma="Francês">Francês</a></li>
-          <li><a href="#" data-idioma="Japonês">Japonês</a></li>
+          <li><a href="javascript:void(0)" role="button" data-idioma="" class="active">Todos</a></li>
+          <li><a href="javascript:void(0)" role="button" data-idioma="Português (BR)">Português(br)</a></li>
+          <li><a href="javascript:void(0)" role="button" data-idioma="Inglês">Inglês</a></li>
+          <li><a href="javascript:void(0)" role="button" data-idioma="Espanhol">Espanhol</a></li>
+          <li><a href="javascript:void(0)" role="button" data-idioma="Francês">Francês</a></li>
+          <li><a href="javascript:void(0)" role="button" data-idioma="Japonês">Japonês</a></li>
         </ul>
       </div>
 
@@ -77,10 +81,25 @@
         <h4>Preço (BRL)</h4>
         <div class="price-range">
           <div class="price-labels">
-            <span id="preco-min-label">R$10</span>
-            <span id="preco-max-label">R$789</span>
+            <span id="preco-min-label">R$0</span>
+            <span id="preco-max-label">R$500</span>
           </div>
-          <input type="range" min="10" max="789" value="789" class="slider" id="preco-slider">
+          <input type="range" min="0" max="500" value="500" class="slider" id="preco-slider">
+          <div class="price-inputs">
+            <div class="price-field">
+              <span>Mín R$</span>
+              <input type="number" id="preco-min-input" placeholder="0" min="0" max="5000" step="1">
+            </div>
+            <span class="price-sep">-</span>
+            <div class="price-field">
+              <span>Máx R$</span>
+              <input type="number" id="preco-max-input" placeholder="500" min="0" max="5000" step="1">
+            </div>
+          </div>
+          <div class="price-actions">
+            <button type="button" id="btn-aplicar-preco" class="btn btn-primary btn-sm btn-block">Aplicar filtro</button>
+            <button type="button" id="btn-limpar-preco" class="btn btn-outline btn-sm btn-block">Limpar filtros</button>
+          </div>
         </div>
       </div>
     </aside>
@@ -137,6 +156,7 @@
   </div>
 
   <script src="../../assets/js/api.js"></script>
+  <script src="../../assets/js/toast.js"></script>
   <script src="../../assets/js/menu-usuario.js"></script>
   <script src="marketplace.js"></script>
 </body>

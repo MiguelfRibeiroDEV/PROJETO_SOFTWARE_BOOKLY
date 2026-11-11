@@ -1,48 +1,36 @@
 .top-header {
-  background-color: #2c2c2c;
+  background-color: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
   padding: 16px 40px;
   display: flex;
   align-items: center;
   gap: 24px;
-  border-bottom: 1px solid #1f1f1f;
-}
-
-.nav-right {
-  margin-left: auto;
-  display: flex;
-  gap: 20px;
-}
-
-.nav-link {
-  color: #e5e7eb;
-  font-size: 0.9rem;
-}
-
-.nav-link:hover {
-  color: #ffffff;
 }
 
 .favoritos-container {
   max-width: 1100px;
+  width: 100%;
   margin: 0 auto;
-  padding: 40px 24px 80px;
-  color: #f3f4f6;
+  padding: 36px 24px 80px;
+  color: var(--text-main);
+  box-sizing: border-box;
 }
 
 .favoritos-title {
-  font-size: 1.7rem;
+  font-size: 2rem;
   font-weight: 800;
   margin-bottom: 6px;
+  color: var(--text-main);
 }
 
 .favoritos-subtitle {
-  color: #b8bcc4;
+  color: var(--text-muted);
   margin-bottom: 28px;
   font-size: 0.95rem;
 }
 
 .favoritos-status {
-  color: #b8bcc4;
+  color: var(--text-muted);
   font-size: 0.95rem;
 }
 
@@ -53,12 +41,15 @@
 }
 
 .favorito-card {
-  background: var(--bg-card, #f5f5f5);
-  border-radius: var(--radius-md, 14px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  color: #1a1a1a;
+  color: var(--text-main);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-theme);
 }
 
 .favorito-cover img {
@@ -87,23 +78,24 @@
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.25;
+  color: var(--text-main);
 }
 
 .favorito-preco {
   font-weight: 800;
-  color: var(--color-primary, #2f80ed);
+  color: var(--color-primary);
   white-space: nowrap;
 }
 
 .favorito-autor {
-  color: #6b6b6b;
+  color: var(--text-muted);
   font-size: 0.85rem;
 }
 
 .favorito-meta {
-  color: #8a8a8a;
+  color: var(--text-muted);
   font-size: 0.78rem;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .favorito-buttons {
@@ -113,16 +105,16 @@
 }
 
 .favorito-buttons .btn {
-  padding: 8px 14px;
-  font-size: 0.82rem;
+  flex: 1;
 }
 
-.btn-danger {
-  background: #fdeceb;
-  color: var(--color-red, #ff6b6b);
-}
+@media (max-width: 768px) {
+  .favoritos-container {
+    padding: 24px 16px 60px;
+  }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  .favoritos-lista {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+  }
 }

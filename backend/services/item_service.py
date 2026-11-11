@@ -94,3 +94,23 @@ class DeletarItemService:
 
         item.deletar()
         return True
+
+
+class ObterFaixaPrecoService:
+    """Retorna o menor e o maior preço reais dos itens disponíveis (não vendidos) no banco."""
+    def executar(self):
+        from models.database import db
+        from sqlalchemy import func
+
+        res = (
+            db.session.query(func.min(Item.preco), func.max(Item.preco))
+            .filter(Item.id_comprador.is_(None))
+            .first()
+        )
+        min_p = float(res[0]) if res and res[0] is not None else 0.0
+        max_p = float(res[1]) if res and res[1] is not None else 100.0
+
+        return {
+            "preco_min": round(min_p, 2),
+            "preco_max": round(max_p, 2),
+        }

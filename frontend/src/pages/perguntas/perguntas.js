@@ -17,6 +17,10 @@ function mostrarMensagem(texto, erro = false) {
   msgEl.hidden = !texto;
   clearTimeout(timerMsg);
   if (texto) timerMsg = setTimeout(() => { msgEl.hidden = true; }, 5000);
+  if (texto && window.BooklyToast) {
+    if (erro) BooklyToast.error(texto);
+    else BooklyToast.success(texto);
+  }
 }
 
 function formatarDataHora(iso) {

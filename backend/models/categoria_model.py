@@ -45,8 +45,8 @@ class Categoria(db.Model):
 
     @staticmethod
     def buscar_por_id(id_categoria):
-        """READ: busca um comprador pelo id."""
-        return Categoria.query.get(id_categoria)
+        """READ: busca uma categoria pelo id."""
+        return db.session.get(Categoria, id_categoria)
 
 
 

@@ -1,3 +1,4 @@
+from models.database import db
 from models.carrinho_model import Carrinho
 from models.item_model import Item
 from models.livro_model import Livro
@@ -12,7 +13,7 @@ def _montar_linha(entrada):
     item = Item.buscar_por_id(entrada.id_item)
     livro = Livro.buscar_por_id(item.id_livro) if item else None
     livreiro = Livreiro.buscar_por_id(livro.id_livreiro) if livro else None
-    categoria = Categoria.query.get(livro.id_categoria) if livro else None
+    categoria = db.session.get(Categoria, livro.id_categoria) if livro else None
     return {
         "id_item": entrada.id_item,
         "nome": livro.nome if livro else None,

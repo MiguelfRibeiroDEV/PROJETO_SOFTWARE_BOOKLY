@@ -5,44 +5,134 @@
    Este arquivo deve ser importado ANTES do CSS de cada página.
 ========================================================= */
 
+@import "./toast.css";
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Garante que o autofill do navegador respeite o tema sem pintar campos de branco */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--text-main) !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--bg-input) inset !important;
+  box-shadow: 0 0 0px 1000px var(--bg-input) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ================= WRAP DE SENHA COM OLHINHO ================= */
+.input-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-password-wrap input {
+  width: 100%;
+  padding-right: 44px !important;
+}
+
+.btn-toggle-pass {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+.btn-toggle-pass:hover {
+  color: var(--color-primary);
 }
 
 :root {
-  /* Paleta geral */
-  --bg-app: #3b3b3b;
-  --bg-card: #f5f5f5;
-  --bg-input: #d9d9d9;
-  --bg-input-dark: #e4e4e4;
-  --text-main: #1a1a1a;
-  --text-muted: #6b6b6b;
-  --text-placeholder: #8a8a8a;
-
+  /* Cores de destaque (brand) */
   --color-primary: #2f80ed;
   --color-primary-dark: #1c66c9;
   --color-navy: #0c1230;
   --color-green: #1fbf6b;
   --color-red: #ff6b6b;
 
-  --border-light: #d0d0d0;
-  --radius-lg: 24px;
-  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
   --radius-pill: 999px;
 
-  --shadow-card: 0 20px 45px rgba(0, 0, 0, 0.35);
+  --transition-theme: background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+/* ================= TEMA ESCURO (DARK MODE - Padrão do Bookly) ================= */
+:root, [data-theme="dark"] {
+  --bg-app: #18191d;            /* Fundo geral escuro da aplicação */
+  --bg-header: #202228;         /* Barra superior */
+  --bg-card: #202228;           /* Fundo dos cartões e caixas */
+  --bg-card-hover: #262932;
+  --bg-input: #2a2d36;          /* Campos de formulário e inputs */
+  --bg-input-dark: #24262e;
+  --border-color: #323644;      /* Bordas discretas */
+  --border-light: #323644;
+
+  --text-main: #f3f4f6;         /* Texto principal */
+  --text-muted: #9ca3af;        /* Texto secundário */
+  --text-placeholder: #6b7280;
+
+  --shadow-card: 0 10px 28px rgba(0, 0, 0, 0.4);
+  --shadow-dropdown: 0 14px 34px rgba(0, 0, 0, 0.6);
+
+  --btn-outline-border: #4b5563;
+  --btn-outline-text: #f3f4f6;
+  --btn-outline-hover-bg: rgba(255, 255, 255, 0.08);
+
+  --logo-text-color: #ffffff;
+}
+
+/* ================= TEMA CLARO (LIGHT MODE) ================= */
+[data-theme="light"] {
+  --bg-app: #edf0f5;            /* Fundo geral que contrasta nitidamente com os cartões brancos */
+  --bg-header: #ffffff;         /* Topo branco limpo */
+  --bg-card: #ffffff;           /* Cartões brancos */
+  --bg-card-hover: #f8fafc;
+  --bg-input: #ffffff;          /* Inputs brancos com borda nítida */
+  --bg-input-dark: #f1f5f9;
+  --border-color: #323644;      /* Cor de borda cinza nítida e bem visível solicitada pelo usuário */
+  --border-light: #323644;
+
+  --text-main: #0f172a;         /* Texto escuro chumbo profundo com legibilidade perfeita */
+  --text-muted: #334155;        /* Texto secundário cinza escuro nítido (WCAG AAA - NUNCA cinza claro que some!) */
+  --text-placeholder: #64748b;
+
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-dropdown: 0 10px 28px rgba(0, 0, 0, 0.14);
+
+  --btn-outline-border: #323644;
+  --btn-outline-text: #0f172a;
+  --btn-outline-hover-bg: rgba(0, 0, 0, 0.05);
+
+  --logo-text-color: #0f172a;
 }
 
 body {
   background-color: var(--bg-app);
   color: var(--text-main);
   min-height: 100vh;
+  transition: var(--transition-theme);
 }
 
-/* o atributo hidden sempre esconde, mesmo que uma classe defina display */
+/* O atributo hidden sempre esconde */
 [hidden] {
   display: none !important;
 }
@@ -60,24 +150,79 @@ button {
 
 input, select, textarea, button {
   font-size: 0.95rem;
+  font-family: inherit;
 }
 
-/* ================= LOGO BOOKLY (texto) =================
-   Reutilizada em todas as páginas: <span class="bookly-logo">
-   <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
-   </span>
-*/
+/* ================= HEADER GLOBAL ================= */
+.top-header {
+  background-color: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 16px 40px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  transition: var(--transition-theme);
+}
+
+.nav-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  flex-wrap: nowrap !important;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ================= LOGO BOOKLY (texto) ================= */
 .bookly-logo {
-  font-size: 1.9rem;
+  font-size: 1.85rem;
   font-weight: 800;
   letter-spacing: 0.5px;
-  color: #ffffff;
+  color: var(--logo-text-color);
   display: inline-block;
+  transition: var(--transition-theme);
+  flex-shrink: 0;
 }
 
-.bookly-logo .l-b { color: #fbe98a; }
-.bookly-logo .l-k { color: #ff6b6b; }
-.bookly-logo .l-l { color: #2f80ed; }
+.bookly-logo .l-b { color: #f59e0b; }
+.bookly-logo .l-k { color: #ef4444; }
+.bookly-logo .l-l { color: #2563eb; }
+
+/* ================= BOTÃO DE TEMA (DARK / LIGHT TOGGLE) ================= */
+.btn-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-theme-toggle:hover {
+  transform: scale(1.06);
+  border-color: var(--color-primary);
+  background-color: var(--bg-card-hover);
+}
+
+.btn-theme-toggle svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.btn-theme-toggle:hover svg {
+  transform: rotate(20deg);
+}
 
 /* ================= BOTÕES REUTILIZÁVEIS ================= */
 .btn {
@@ -85,10 +230,10 @@ input, select, textarea, button {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 28px;
+  padding: 10px 24px;
   border-radius: var(--radius-pill);
   font-weight: 600;
-  transition: filter 0.15s ease, transform 0.05s ease;
+  transition: filter 0.15s ease, transform 0.05s ease, background-color 0.2s ease;
 }
 
 .btn:active {
@@ -97,28 +242,131 @@ input, select, textarea, button {
 
 .btn-primary {
   background-color: var(--color-primary);
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 .btn-primary:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.1);
 }
 
 .btn-outline {
   background-color: transparent;
-  border: 1.5px solid #2a2a2a;
-  color: #1a1a1a;
+  border: 1.5px solid var(--btn-outline-border);
+  color: var(--btn-outline-text);
 }
 
 .btn-outline:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: var(--btn-outline-hover-bg);
 }
 
-/* ================= SCROLLBAR (opcional, discreta) ================= */
+/* ================= RESPONSIVIDADE GLOBAL ================= */
+@media (max-width: 768px) {
+  .top-header {
+    padding: 12px 18px !important;
+    gap: 12px !important;
+  }
+
+  .nav-right {
+    gap: 10px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .bookly-logo {
+    font-size: 1.6rem !important;
+  }
+
+  .btn {
+    padding: 8px 18px !important;
+    font-size: 0.86rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-header {
+    padding: 10px 14px !important;
+  }
+
+  .nav-right {
+    gap: 8px !important;
+  }
+
+  .nav-link {
+    font-size: 0.82rem !important;
+  }
+}
+
+/* ================= SCROLLBAR DISCRETA ================= */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #5a5a5a;
+  background: var(--border-color);
   border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* ================= AUTOCOMPLETE DE CEP E ENDEREÇO UNIVERSAL ================= */
+.cep-autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background-color: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-dropdown);
+  z-index: 1000;
+  list-style: none;
+  padding: 6px 0;
+  margin: 0;
+}
+
+.cep-autocomplete-dropdown[hidden] {
+  display: none !important;
+}
+
+.cep-sugestao-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.cep-sugestao-item:hover {
+  background-color: var(--bg-card-hover);
+}
+
+.cep-sugestao-icone {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.cep-sugestao-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cep-sugestao-texto strong {
+  font-size: 0.88rem;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cep-sugestao-texto span {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
