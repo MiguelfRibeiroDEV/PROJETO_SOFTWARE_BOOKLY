@@ -204,6 +204,9 @@ Todas as funcionalidades abaixo estão implementadas de ponta a ponta:
 7. **Buscar livros com filtros combinados (marketplace)** — Tela `marketplace.html` → `GET /livros/filtro` (Stored Procedure `sp_buscar_livros_filtro` via `LivroRepository`)
 8. **Gerar relatório de preço médio por categoria** — Tela `cadastro.html` (passo 3, recomendação de preço) → `GET /relatorios/preco-medio-categoria` (Stored Procedure `sp_relatorio_preco_medio_categoria` via `CategoriaRepository`)
 9. **Atualizar e excluir cadastros** (livro, livreiro, comprador, categoria, item, estimativa) — `PUT`/`DELETE` para cada recurso
+10. Favoritar um livro - tela marketplace (coracao) -> POST /compradores/<id>/favoritos -> FavoritoController -> AdicionarFavoritoService -> Favorito (Model)
+- Listar favoritos - tela favoritos.html -> GET /compradores/<id>/favoritos -> FavoritoController -> ListarFavoritosService -> Favorito, Item, Livro
+- Remover favorito - coracao ou botao "Remover" -> DELETE /compradores/<id>/favoritos/<id_item> -> FavoritoController -> RemoverFavoritoService -> Favorito
 
 ### ✨ Novas funcionalidades adicionadas
 

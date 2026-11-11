@@ -12,6 +12,7 @@ from models.categoria_model import Categoria
 from models.comprador_model import Comprador
 from models.item_model import Item
 from models.estimativa_model import Estimativa
+from models.favorito_model import Favorito
 
 # Importa os controllers (Blueprints) com as rotas da API
 from controllers.livreiro_controller import livreiro_controller
@@ -25,6 +26,7 @@ from controllers.auth_controller import auth_controller
 from controllers.pedido_controller import pedido_controller
 from controllers.dashboard_controller import dashboard_controller
 from controllers.catalogo_controller import catalogo_controller
+from controllers.favorito_controller import favorito_controller
 
 
 def create_app():
@@ -53,6 +55,7 @@ def create_app():
     app.register_blueprint(pedido_controller)
     app.register_blueprint(dashboard_controller)
     app.register_blueprint(catalogo_controller)
+    app.register_blueprint(favorito_controller)
 
     @app.get("/")
     def home():

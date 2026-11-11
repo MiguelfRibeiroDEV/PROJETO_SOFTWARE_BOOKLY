@@ -3,6 +3,7 @@ const statusEl = document.getElementById("storefront-status");
 const template = document.getElementById("book-card-template");
 
 let todosOsLivros = [];
+let favoritosIds = new Set();
 const filtros = { id_categoria: "", preco_max: 789, busca: "", conservacao: "", idioma: "" };
 
 const CORES_CAPA = ["#5b6ee1", "#e2637b", "#3fae7a", "#d1a13c", "#8158d6", "#3ea0c9"];
@@ -50,6 +51,9 @@ function renderizarLivros(lista) {
     card.querySelector(".book-meta").textContent = `${livro.categoria} · ${livro.conservacao || "—"}`;
     card.querySelector(".btn-buy-now").dataset.idItem = livro.id_item;
     card.querySelector(".btn-buy-now").dataset.nome = livro.nome;
+    const btnFavorito = card.querySelector(".btn-favorito");
+    btnFavorito.dataset.idItem = livro.id_item;
+    marcarCoracao(btnFavorito, favoritosIds.has(Number(livro.id_item)));
 
     grid.appendChild(card);
   });
@@ -186,6 +190,7 @@ async function comprarItem(idItem, nomeLivro, botao) {
 
     alert(`Compra de "${nomeLivro}" registrada com sucesso!`);
     carregarLivros();
+    carregarFavoritos();
   } catch (erro) {
     alert(erro.message);
     botao.disabled = false;
@@ -201,11 +206,69 @@ grid.addEventListener("click", (event) => {
   comprarItem(idItem, nome, botao);
 });
 
+
+// =========================================================
+// FUNCIONALIDADES: Favoritar / desfavoritar / listar favoritos
+// =========================================================
+function marcarCoracao(botao, ativo) {
+  botao.classList.toggle("ativo", ativo);
+  botao.innerHTML = ativo ? "&#9829;" : "&#9825;";
+  botao.setAttribute("aria-label", ativo ? "Remover dos favoritos" : "Favoritar");
+}
+
+async function carregarFavoritos() {
+  const idComprador = localStorage.getItem("bookly_usuario_id");
+  if (localStorage.getItem("bookly_usuario_tipo") !== "comprador" || !idComprador) return;
+
+  try {
+    const favoritos = await apiRequest(`/compradores/${idComprador}/favoritos`);
+    favoritosIds = new Set(favoritos.map((f) => Number(f.id_item)));
+    if (todosOsLivros.length > 0) aplicarFiltrosLocais();
+  } catch (erro) {
+    console.error("Não foi possível carregar favoritos:", erro);
+  }
+}
+
+async function alternarFavorito(botao) {
+  const idComprador = localStorage.getItem("bookly_usuario_id");
+  if (localStorage.getItem("bookly_usuario_tipo") !== "comprador" || !idComprador) {
+    alert("Faça login como comprador para favoritar livros.");
+    window.location.href = "../login/login.html";
+    return;
+  }
+
+  const idItem = Number(botao.dataset.idItem);
+  const jaFavorito = favoritosIds.has(idItem);
+
+  try {
+    if (jaFavorito) {
+      await apiRequest(`/compradores/${idComprador}/favoritos/${idItem}`, { method: "DELETE" });
+      favoritosIds.delete(idItem);
+    } else {
+      await apiRequest(`/compradores/${idComprador}/favoritos`, {
+        method: "POST",
+        body: { id_item: idItem },
+      });
+      favoritosIds.add(idItem);
+    }
+    marcarCoracao(botao, !jaFavorito);
+  } catch (erro) {
+    alert(erro.message);
+  }
+}
+
+grid.addEventListener("click", (event) => {
+  const botao = event.target.closest(".btn-favorito");
+  if (botao) alternarFavorito(botao);
+});
+
+
 function atualizarNavPorLogin() {
   const tipoUsuario = localStorage.getItem("bookly_usuario_tipo");
 
   if (tipoUsuario === "comprador") {
     document.getElementById("nav-meus-pedidos").hidden = false;
+    document.getElementById("nav-favoritos").hidden = false;
   } else if (tipoUsuario === "livreiro") {
     document.getElementById("nav-painel").hidden = false;
     document.getElementById("nav-catalogo").hidden = false;

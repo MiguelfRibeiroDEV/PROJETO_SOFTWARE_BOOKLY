@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookly - Meus Favoritos</title>
+  <link rel="stylesheet" href="../../styles/base/base.css">
+  <link rel="stylesheet" href="../../styles/favoritos/favoritos.css">
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="top-header">
+    <a href="../marketplace/marketplace.html" class="bookly-logo">
+      <span class="l-b">B</span>oo<span class="l-k">k</span><span class="l-l">L</span>y
+    </a>
+    <nav class="nav-right">
+      <a href="../marketplace/marketplace.html" class="nav-link">Marketplace</a>
+      <a href="../meus-pedidos/meus-pedidos.html" class="nav-link">Meus pedidos</a>
+    </nav>
+  </header>
+
+  <main class="favoritos-container">
+    <h1 class="favoritos-title">Meus Favoritos</h1>
+    <p class="favoritos-subtitle">Livros que você salvou para ver depois.</p>
+
+    <p id="favoritos-status" class="favoritos-status">Carregando favoritos...</p>
+
+    <div class="favoritos-lista" id="favoritos-lista"></div>
+  </main>
+
+  <template id="favorito-card-template">
+    <article class="favorito-card">
+      <div class="favorito-cover"><img alt="Capa do livro"></div>
+      <div class="favorito-info">
+        <div class="favorito-header">
+          <h3 class="favorito-titulo"></h3>
+          <span class="favorito-preco"></span>
+        </div>
+        <p class="favorito-autor"></p>
+        <p class="favorito-meta"></p>
+        <div class="favorito-buttons">
+          <button type="button" class="btn btn-primary btn-comprar">Comprar</button>
+          <button type="button" class="btn btn-danger btn-remover">Remover</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="../../assets/js/api.js"></script>
+  <script src="favoritos.js"></script>
+</body>
+</html>
